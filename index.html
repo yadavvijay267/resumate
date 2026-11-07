@@ -59,7 +59,7 @@
 
   /* ---------- Hero ---------- */
   .hero{position:relative;overflow:hidden;padding:76px 24px 88px}
-  #netCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+  #netCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:-10}
   .hero-glow{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
   .hero-glow.left{width:480px;height:480px;left:-160px;top:-120px;background:rgba(186,230,253,.5)}
   .hero-glow.right{width:480px;height:480px;right:-160px;top:-100px;background:rgba(249,168,212,.38)}
@@ -192,6 +192,7 @@
 </style>
 </head>
 <body>
+<canvas id="netCanvas" aria-hidden="true"></canvas>
 
 <!-- ================= HEADER ================= -->
 <header class="site-header">
@@ -239,7 +240,6 @@
 
 <!-- ================= HERO ================= -->
 <section class="hero">
-  <canvas id="netCanvas" aria-hidden="true"></canvas>
   <div class="hero-glow left"></div>
   <div class="hero-glow right"></div>
   <div class="hero-dots left"></div>
@@ -657,139 +657,137 @@
     });
   });
 
-  /* ---------- Mouse-follow particle network (hero background) ---------- */
+  /* ---------- Particle network background (full page, grid constellation) ---------- */
   (function () {
     var canvas = document.getElementById('netCanvas');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
-    var hero = canvas.parentElement;
-    var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
-    var pts = [];
-    var mouse = { x: -9999, y: -9999 };
+    if (!ctx) return;
+    var LINE_RGB = "99,102,241"; /* indigo — ResuMate blue/violet */
+    var points = [];
+    var target = { x: -9999, y: -9999 };
+    var raf = 0;
     var running = true;
+    var visible = true;
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var COLORS = ['37,99,235', '124,58,237', '14,165,233']; /* blue, violet, sky */
 
-    function resize() {
-      var r = hero.getBoundingClientRect();
-      W = r.width; H = r.height;
-      canvas.width = W * dpr; canvas.height = H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      seed();
+    function easeInOutCirc(t) {
+      return t < 0.5
+        ? (1 - Math.sqrt(1 - Math.pow(2 * t, 2))) / 2
+        : (Math.sqrt(1 - Math.pow(-2 * t + 2, 2)) + 1) / 2;
     }
-    function seed() {
-      var n = Math.max(35, Math.min(90, Math.floor(W * H / 16000)));
-      pts = [];
-      for (var i = 0; i < n; i++) {
-        pts.push({
-          x: Math.random() * W, y: Math.random() * H,
-          vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
-          r: 1.6 + Math.random() * 2.2,
-          c: COLORS[i % COLORS.length]
-        });
-      }
-    }
-    function step() {
-      if (!running) return;
-      ctx.clearRect(0, 0, W, H);
-      var i, j, p, q, dx, dy, d2;
-      var LINK = 140, MLINK = 170;
+    function dist2(a, b) { return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y); }
 
-      /* move */
-      for (i = 0; i < pts.length; i++) {
-        p = pts[i];
-        /* gentle pull toward mouse when close */
-        dx = mouse.x - p.x; dy = mouse.y - p.y; d2 = dx * dx + dy * dy;
-        if (d2 < MLINK * MLINK && d2 > 1) {
-          var d = Math.sqrt(d2);
-          p.vx += (dx / d) * 0.012; p.vy += (dy / d) * 0.012;
+    function build() {
+      var w = canvas.clientWidth;
+      var h = canvas.clientHeight;
+      if (!w || !h) return;
+      canvas.width = w;
+      canvas.height = h;
+      var spacing = 60;
+      points = [];
+      var x, y;
+      for (x = 0; x < w; x += spacing) {
+        for (y = 0; y < h; y += spacing) {
+          var px = x + Math.random() * spacing;
+          var py = y + Math.random() * spacing;
+          points.push({
+            x: px, y: py, originX: px, originY: py, closest: [],
+            radius: 2 + Math.random() * 2, circleActive: 0, active: 0,
+            fromX: px, fromY: py, toX: px, toY: py,
+            start: performance.now(), dur: 1000 + Math.random() * 1000
+          });
         }
-        p.vx *= 0.985; p.vy *= 0.985;
-        /* keep a minimum drift so it never freezes */
-        if (Math.abs(p.vx) < 0.08) p.vx += (Math.random() - 0.5) * 0.02;
-        if (Math.abs(p.vy) < 0.08) p.vy += (Math.random() - 0.5) * 0.02;
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < -20) p.x = W + 20; if (p.x > W + 20) p.x = -20;
-        if (p.y < -20) p.y = H + 20; if (p.y > H + 20) p.y = -20;
       }
+      /* 5 closest neighbours for each point */
+      for (var i = 0; i < points.length; i++) {
+        var p1 = points[i];
+        var closest = [];
+        for (var j = 0; j < points.length; j++) {
+          var p2 = points[j];
+          if (p1 === p2) continue;
+          if (closest.length < 5) { closest.push(p2); continue; }
+          var far = 0;
+          for (var k = 1; k < 5; k++) {
+            if (dist2(p1, closest[k]) > dist2(p1, closest[far])) far = k;
+          }
+          if (dist2(p1, p2) < dist2(p1, closest[far])) closest[far] = p2;
+        }
+        p1.closest = closest;
+      }
+    }
 
-      /* links between particles */
-      for (i = 0; i < pts.length; i++) {
-        p = pts[i];
-        for (j = i + 1; j < pts.length; j++) {
-          q = pts[j];
-          dx = p.x - q.x; dy = p.y - q.y; d2 = dx * dx + dy * dy;
-          if (d2 < LINK * LINK) {
-            var a = (1 - Math.sqrt(d2) / LINK) * 0.35;
-            ctx.strokeStyle = 'rgba(99,102,241,' + a.toFixed(3) + ')';
-            ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+    function draw(now) {
+      var w = canvas.width;
+      var h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < points.length; i++) {
+        var p = points[i];
+        if (reduced) {
+          p.active = 0.06;
+          p.circleActive = 0.12;
+        } else {
+          var tt = Math.min(1, (now - p.start) / p.dur);
+          var e = easeInOutCirc(tt);
+          p.x = p.fromX + (p.toX - p.fromX) * e;
+          p.y = p.fromY + (p.toY - p.fromY) * e;
+          if (tt >= 1) {
+            p.fromX = p.x; p.fromY = p.y;
+            p.toX = p.originX - 50 + Math.random() * 100;
+            p.toY = p.originY - 50 + Math.random() * 100;
+            p.start = now;
+            p.dur = 1000 + Math.random() * 1000;
+          }
+          var d = dist2(target, p);
+          if (d < 4000) { p.active = 0.3; p.circleActive = 0.6; }
+          else if (d < 20000) { p.active = 0.1; p.circleActive = 0.3; }
+          else if (d < 40000) { p.active = 0.02; p.circleActive = 0.1; }
+          else { p.active = 0; p.circleActive = 0; }
+        }
+        if (p.active) {
+          for (var c = 0; c < p.closest.length; c++) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.closest[c].x, p.closest[c].y);
+            ctx.strokeStyle = "rgba(" + LINE_RGB + "," + p.active + ")";
+            ctx.stroke();
           }
         }
-        /* link particle -> mouse (the follow effect) */
-        dx = p.x - mouse.x; dy = p.y - mouse.y; d2 = dx * dx + dy * dy;
-        if (d2 < MLINK * MLINK) {
-          var ma = (1 - Math.sqrt(d2) / MLINK) * 0.55;
-          ctx.strokeStyle = 'rgba(37,99,235,' + ma.toFixed(3) + ')';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+        if (p.circleActive) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+          ctx.fillStyle = "rgba(" + LINE_RGB + "," + p.circleActive + ")";
+          ctx.fill();
         }
       }
-
-      /* dots */
-      for (i = 0; i < pts.length; i++) {
-        p = pts[i];
-        dx = p.x - mouse.x; dy = p.y - mouse.y;
-        var near = (dx * dx + dy * dy) < MLINK * MLINK;
-        ctx.fillStyle = near
-          ? 'rgba(' + p.c + ',0.85)'
-          : 'rgba(' + p.c + ',0.45)';
-        ctx.beginPath(); ctx.arc(p.x, p.y, near ? p.r + 0.8 : p.r, 0, 6.2832); ctx.fill();
-      }
-      /* mouse glow dot */
-      if (mouse.x > -100) {
-        var g = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 60);
-        g.addColorStop(0, 'rgba(124,58,237,0.18)');
-        g.addColorStop(1, 'rgba(124,58,237,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 60, 0, 6.2832); ctx.fill();
-      }
-      requestAnimationFrame(step);
     }
 
-    hero.addEventListener('mousemove', function (e) {
-      var r = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
-    });
-    hero.addEventListener('mouseleave', function () { mouse.x = -9999; mouse.y = -9999; });
-    /* touch: follow the finger */
-    hero.addEventListener('touchmove', function (e) {
-      var t = e.touches[0]; if (!t) return;
-      var r = canvas.getBoundingClientRect();
-      mouse.x = t.clientX - r.left; mouse.y = t.clientY - r.top;
-    }, { passive: true });
-    hero.addEventListener('touchend', function () { mouse.x = -9999; mouse.y = -9999; });
-
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries) {
-        var vis = entries[0].isIntersecting;
-        if (vis && !running) { running = true; requestAnimationFrame(step); }
-        else if (!vis) { running = false; }
-      }).observe(hero);
+    function loop(now) {
+      if (!running) return;
+      if (visible && !reduced) draw(now);
+      raf = requestAnimationFrame(loop);
     }
-    window.addEventListener('resize', resize);
-    resize();
-    if (reduced) {
-      /* static faint frame for reduced motion */
+    function onMouse(e) {
+      var r = canvas.getBoundingClientRect();
+      target = { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    function onResize() { build(); }
+
+    build();
+    if (reduced) { draw(performance.now()); }
+    else { raf = requestAnimationFrame(loop); }
+    if (!("ontouchstart" in window)) window.addEventListener("mousemove", onMouse);
+    var ro = new ResizeObserver(onResize);
+    ro.observe(canvas);
+    var io = new IntersectionObserver(function (entries) { visible = entries[0].isIntersecting; });
+    io.observe(canvas);
+    window.addEventListener("beforeunload", function () {
       running = false;
-      ctx.clearRect(0, 0, W, H);
-      pts.forEach(function (p) {
-        ctx.fillStyle = 'rgba(' + p.c + ',0.3)';
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fill();
-      });
-    } else {
-      requestAnimationFrame(step);
-    }
+      cancelAnimationFrame(raf);
+      window.removeEventListener("mousemove", onMouse);
+      ro.disconnect();
+      io.disconnect();
+    });
   })();
 
   /* ---------- Persona switcher ---------- */
