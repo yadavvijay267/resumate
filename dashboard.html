@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Resumes — ResuMate</title>
+<meta name="description" content="Continue editing your resumes, import an existing one, or check your ATS score.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --navy:#0F172A; --slate:#475569; --slate-light:#64748B; --faint:#94A3B8;
+    --blue:#2563EB; --violet:#7C3AED;
+    --grad:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);
+    --cream:#FDF3E7; --line:#E9EEF4;
+    --shadow:0 18px 40px rgba(15,23,42,.08);
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--slate);background:#FBFCFE;line-height:1.6;font-size:16px}
+  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;color:var(--navy);line-height:1.15;font-weight:600}
+  a{text-decoration:none}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid transparent;cursor:pointer;transition:transform .18s,box-shadow .18s;font-family:'Inter',sans-serif;background:#fff;color:var(--navy)}
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(99,73,237,.28)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(99,73,237,.34)}
+  .btn-outline{background:#fff;border-color:#CBD5E1;color:var(--navy)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+  .btn-sm{padding:9px 20px;font-size:14px}
+  .btn-mini{padding:7px 14px;font-size:13px;border-radius:999px}
+  .btn-danger:hover{border-color:var(--red,#DC2626);color:var(--red,#DC2626)}
+
+  .site-header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid #EEF2F7}
+  .header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:28px}
+  .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .logo-mark{width:38px;height:38px;border-radius:11px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:21px;box-shadow:0 6px 14px rgba(99,73,237,.3)}
+  .logo-text{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+  .logo-text em{font-style:normal;color:var(--blue)}
+  .main-nav{display:flex;align-items:center;gap:26px;margin-left:auto}
+  .main-nav>a{color:var(--navy);font-size:14.5px;font-weight:500;white-space:nowrap}
+  .main-nav a:hover{color:var(--blue)}
+  .main-nav a.active{color:var(--blue);font-weight:700}
+  .header-cta{margin-left:8px}
+  #userBadge{display:none;font-size:13.5px;font-weight:600;color:var(--slate);margin-left:8px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:52px 24px 90px}
+  .dash-top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:30px}
+  .dash-top h1{font-size:36px;margin-right:auto}
+  .demo-banner{display:none;background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;border-radius:14px;padding:12px 18px;font-size:14px;font-weight:500;margin-bottom:22px}
+  .demo-banner a{color:#92400E;font-weight:700;text-decoration:underline}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:30px}
+  @media(max-width:700px){.stats{grid-template-columns:1fr}}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 24px;box-shadow:var(--shadow)}
+  .stat b{font-family:'Fraunces',serif;font-size:34px;color:var(--navy);display:block;line-height:1}
+  .stat span{font-size:13.5px;color:var(--slate-light);font-weight:500}
+  .stat.link-card{cursor:pointer;transition:transform .15s}
+  .stat.link-card:hover{transform:translateY(-3px);border-color:var(--blue)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  .resume-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;transition:transform .15s,box-shadow .15s}
+  .resume-card:hover{transform:translateY(-3px);box-shadow:0 24px 50px rgba(15,23,42,.12)}
+  .rc-title{font-size:18px;font-weight:700;color:var(--navy);font-family:'Inter',sans-serif}
+  .rc-meta{font-size:13px;color:var(--faint)}
+  .rc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .empty{background:#fff;border:2px dashed #CBD5E1;border-radius:20px;padding:60px 30px;text-align:center;color:var(--slate-light)}
+  .empty h3{font-size:22px;margin-bottom:8px}
+  .loading{text-align:center;padding:60px;color:var(--faint)}
+
+  /* import modal */
+  .modal-back{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-back.open{display:flex}
+  .modal{background:#fff;border-radius:22px;max-width:640px;width:100%;max-height:90vh;overflow:auto;padding:30px;box-shadow:0 30px 80px rgba(15,23,42,.25)}
+  .modal h2{font-size:24px;margin-bottom:8px}
+  .modal p{font-size:14.5px;color:var(--slate-light);margin-bottom:14px}
+  .modal textarea{width:100%;min-height:220px;border:1px solid #E2E8F0;border-radius:14px;padding:14px;font-family:'Inter',sans-serif;font-size:14px;color:var(--navy);outline:none;resize:vertical}
+  .modal textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+  .modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
+  footer{border-top:1px solid var(--line);padding:34px 24px;text-align:center;color:var(--faint);font-size:13.5px}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index"><span class="logo-mark">R</span><span class="logo-text">Resu<em>Mate</em></span></a>
+    <nav class="main-nav">
+      <a href="index">Home</a>
+      <a href="templates">Templates</a>
+      <a href="ats-checker">ATS Checker</a>
+      <a href="interview-coach">Interview Coach</a>
+      <a href="pricing">Pricing</a>
+      <a href="dashboard" class="active">My Resumes</a>
+    </nav>
+    <span id="userBadge"></span>
+    <button class="btn btn-outline btn-sm header-cta" id="authBtn" type="button">Sign in</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="dash-top">
+    <h1>My <span class="grad-text">Resumes</span></h1>
+    <button class="btn btn-outline btn-sm" id="importBtn" type="button">📥 Import resume</button>
+    <a href="builder" class="btn btn-primary btn-sm">＋ New resume</a>
+  </div>
+
+  <div class="demo-banner" id="demoBanner">
+    You're browsing in <b>demo mode</b> — resumes are saved only in this browser.
+    <a href="signup">Create a free account</a> to sync them everywhere.
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="statTotal">0</b><span>Total resumes</span></div>
+    <div class="stat"><b>8</b><span>Templates available</span></div>
+    <div class="stat link-card" id="atsCard"><b style="color:var(--blue)">→</b><span>Check your ATS score — free</span></div>
+  </div>
+
+  <div id="listArea"><div class="loading">Loading your resumes…</div></div>
+</div>
+
+<div class="modal-back" id="importModal">
+  <div class="modal">
+    <h2>Import your resume</h2>
+    <p>Paste your existing resume text below. We'll extract your details and open them in the builder — review everything before saving.</p>
+    <textarea id="importText" placeholder="Paste your resume text here…"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" id="importCancel" type="button">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="importGo" type="button">Import →</button>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 ResuMate — Your Next Career Starts Here.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var DEMO_KEY = "resumate_demo_resumes";
+  var mode = "demo", currentUser = null;
+
+  function esc(s){
+    return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+
+  /* ---------- auth ---------- */
+  async function initAuth(){
+    if (window.RM && RM.configured){
+      try {
+        var u = await RM.getUser();
+        if (u){
+          mode = "supabase"; currentUser = u;
+          var badge = $("userBadge");
+          badge.style.display = "inline";
+          badge.textContent = u.email || "Account";
+          $("authBtn").textContent = "Sign out";
+        }
+      } catch(e){}
+    }
+    if (mode === "demo") $("demoBanner").style.display = "block";
+    $("authBtn").addEventListener("click", async function(){
+      if (mode === "supabase"){ await RM.signOut(); location.reload(); }
+      else location.href = "login";
+    });
+  }
+
+  /* ---------- data ---------- */
+  function demoLoad(){
+    try { return JSON.parse(localStorage.getItem(DEMO_KEY) || "[]"); }
+    catch(e){ return []; }
+  }
+  function demoSave(list){
+    try { localStorage.setItem(DEMO_KEY, JSON.stringify(list)); } catch(e){}
+  }
+  async function loadAll(){
+    if (mode === "supabase"){
+      var res = await RM.client.from("resumes")
+        .select("id,title,template,content,updated_at")
+        .order("updated_at", { ascending:false });
+      if (res.error) throw new Error(res.error.message);
+      return res.data || [];
+    }
+    return demoLoad();
+  }
+  async function deleteOne(id){
+    if (mode === "supabase"){
+      var res = await RM.client.from("resumes").delete().eq("id", id);
+      if (res.error) throw new Error(res.error.message);
+    } else {
+      demoSave(demoLoad().filter(function(r){ return r.id !== id; }));
+    }
+  }
+  async function duplicateOne(row){
+    var copy = {
+      title: (row.title || "Untitled Resume") + " (copy)",
+      template: row.template || "corporate-modern",
+      content: row.content || {}
+    };
+    if (mode === "supabase"){
+      var res = await RM.client.from("resumes")
+        .insert({ user_id: currentUser.id, title: copy.title, template: copy.template, content: copy.content })
+        .select().single();
+      if (res.error) throw new Error(res.error.message);
+    } else {
+      var list = demoLoad();
+      list.unshift(Object.assign({ id: "demo-" + Date.now(), updated_at: new Date().toISOString() }, copy));
+      demoSave(list);
+    }
+  }
+
+  /* ---------- render ---------- */
+  function fmtDate(iso){
+    try { var d = new Date(iso); return isNaN(d.getTime()) ? "" : d.toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" }); }
+    catch(e){ return ""; }
+  }
+  function render(rows){
+    $("statTotal").textContent = rows.length;
+    var area = $("listArea");
+    if (!rows.length){
+      area.innerHTML =
+        '<div class="empty"><h3 class="serif">No resumes yet</h3>' +
+        '<p style="margin-bottom:20px">Create your first resume in minutes — pick a template and start typing.</p>' +
+        '<a href="builder" class="btn btn-primary">＋ Create my first resume</a></div>';
+      return;
+    }
+    area.innerHTML = '<div class="grid">' + rows.map(function(r){
+      return '<div class="resume-card" data-id="' + esc(r.id) + '">' +
+        '<div class="rc-title">' + esc(r.title || "Untitled Resume") + '</div>' +
+        '<div class="rc-meta">' + esc(r.template || "corporate-modern") + ' · Updated ' + esc(fmtDate(r.updated_at)) + '</div>' +
+        '<div class="rc-actions">' +
+          '<button class="btn btn-primary btn-mini" data-act="edit">Edit</button>' +
+          '<button class="btn btn-outline btn-mini" data-act="ats">ATS score</button>' +
+          '<button class="btn btn-outline btn-mini" data-act="dup">Duplicate</button>' +
+          '<button class="btn btn-outline btn-mini btn-danger" data-act="del">Delete</button>' +
+        '</div></div>';
+    }).join("") + "</div>";
+
+    area.querySelectorAll(".resume-card").forEach(function(card){
+      var id = card.getAttribute("data-id");
+      card.querySelectorAll("[data-act]").forEach(function(btn){
+        btn.addEventListener("click", function(){ handleAction(btn.getAttribute("data-act"), id); });
+      });
+    });
+  }
+
+  function findRow(id, rows){
+    for (var i = 0; i < rows.length; i++) if (String(rows[i].id) === String(id)) return rows[i];
+    return null;
+  }
+
+  function resumeToText(r){
+    var L = [], p = (r.content && r.content.personal) || r.personal || {};
+    if (p.name) L.push(p.name);
+    if (p.title) L.push(p.title);
+    var contact = [p.email, p.phone, p.location, p.linkedin, p.github].filter(Boolean).join(" | ");
+    if (contact) L.push(contact);
+    L.push("");
+    if (p.summary){ L.push("SUMMARY"); L.push(p.summary); L.push(""); }
+    var exp = (r.content && r.content.experience) || r.experience || [];
+    if (exp.length){
+      L.push("EXPERIENCE");
+      exp.forEach(function(e){
+        L.push((e.role||"") + (e.company ? " — " + e.company : ""));
+        if (e.bullets) L.push(e.bullets);
+        L.push("");
+      });
+    }
+    var edu = (r.content && r.content.education) || r.education || [];
+    if (edu.length){
+      L.push("EDUCATION");
+      edu.forEach(function(e){ L.push([e.degree, e.institution, e.years].filter(Boolean).join(", ")); });
+      L.push("");
+    }
+    var skills = (r.content && r.content.skills) || r.skills || "";
+    if (skills){ L.push("SKILLS"); L.push(skills); }
+    return L.join("\n");
+  }
+
+  var cache = [];
+  async function handleAction(act, id){
+    var row = findRow(id, cache);
+    try {
+      if (act === "edit"){
+        location.href = "builder.html?id=" + encodeURIComponent(id);
+      } else if (act === "ats"){
+        if (!row) return;
+        try { localStorage.setItem("resumate_ats_input", resumeToText(row)); } catch(e){}
+        location.href = "ats-checker";
+      } else if (act === "dup"){
+        await duplicateOne(row);
+        await refresh();
+      } else if (act === "del"){
+        if (!confirm('Delete "' + (row.title || "Untitled Resume") + '"? This cannot be undone.')) return;
+        await deleteOne(id);
+        await refresh();
+      }
+    } catch(e){
+      alert("Something went wrong: " + e.message);
+    }
+  }
+
+  async function refresh(){
+    try {
+      cache = await loadAll();
+      render(cache);
+    } catch(e){
+      $("listArea").innerHTML = '<div class="empty"><h3 class="serif">Could not load resumes</h3><p>' + esc(e.message) + '</p></div>';
+    }
+  }
+
+  /* ---------- import ---------- */
+  $("importBtn").addEventListener("click", function(){ $("importModal").classList.add("open"); });
+  $("importCancel").addEventListener("click", function(){ $("importModal").classList.remove("open"); });
+  $("importModal").addEventListener("click", function(e){ if (e.target === $("importModal")) $("importModal").classList.remove("open"); });
+  $("atsCard").addEventListener("click", function(){ location.href = "ats-checker"; });
+
+  $("importGo").addEventListener("click", async function(){
+    var text = $("importText").value.trim();
+    if (text.length < 40){ alert("Please paste your resume text first."); return; }
+    var parsed = parseResumeText(text);
+    try {
+      var payload = { title: (parsed.personal.name ? parsed.personal.name.split(" ")[0] + "'s Resume" : "Imported Resume"),
+                      template: "corporate-modern", content: parsed };
+      var newId;
+      if (mode === "supabase"){
+        var res = await RM.client.from("resumes")
+          .insert({ user_id: currentUser.id, title: payload.title, template: payload.template, content: payload.content })
+          .select().single();
+        if (res.error) throw new Error(res.error.message);
+        newId = res.data.id;
+      } else {
+        newId = "demo-" + Date.now();
+        var list = demoLoad();
+        list.unshift(Object.assign({ id: newId, updated_at: new Date().toISOString() }, payload));
+        demoSave(list);
+      }
+      location.href = "builder.html?id=" + encodeURIComponent(newId);
+    } catch(e){
+      alert("Import failed: " + e.message);
+    }
+  });
+
+  /* Heuristic resume-text parser (original) */
+  function parseResumeText(text){
+    var lines = text.split("\n").map(function(l){ return l.trim(); });
+    var personal = { name:"", title:"", email:"", phone:"", location:"", linkedin:"", github:"", summary:"" };
+    var em = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+    if (em) personal.email = em[0];
+    var ph = text.match(/\+?\d[\d\s().-]{8,}\d/);
+    if (ph) personal.phone = ph[0].trim();
+    var li = text.match(/(linkedin\.com\/[^\s|]+)/i);
+    if (li) personal.linkedin = li[0];
+    var gh = text.match(/(github\.com\/[^\s|]+)/i);
+    if (gh) personal.github = gh[0];
+    for (var i = 0; i < Math.min(4, lines.length); i++){
+      var l = lines[i];
+      if (l && !/@/.test(l) && !/\+?\d{7,}/.test(l) && l.length < 60 && !/^(resume|cv|curriculum)/i.test(l)){
+        if (!personal.name) personal.name = l;
+        else if (!personal.title && l.length < 60){ personal.title = l; break; }
+      }
+    }
+    function sectionBody(names){
+      var idx = -1;
+      for (var i = 0; i < lines.length; i++){
+        var l = lines[i].toLowerCase().replace(/[^a-z ]/g,"").trim();
+        for (var n = 0; n < names.length; n++){
+          if (l === names[n] || l === names[n] + "s"){ idx = i; break; }
+        }
+        if (idx !== -1) break;
+      }
+      if (idx === -1) return "";
+      var out = [], j = idx + 1;
+      var allHeads = ["summary","objective","profile","experience","employment","work history","education","academic","qualification","skills","technical skills","projects","certifications","languages","interests"];
+      while (j < lines.length){
+        var lj = lines[j].toLowerCase().replace(/[^a-z ]/g,"").trim();
+        if (allHeads.indexOf(lj) !== -1) break;
+        out.push(lines[j]); j++;
+      }
+      return out.join("\n").trim();
+    }
+    personal.summary = sectionBody(["summary","objective","profile"]).split("\n").filter(Boolean).join(" ");
+    var skillsRaw = sectionBody(["skills","technical skills"]);
+    var skills = skillsRaw.split("\n").map(function(s){ return s.replace(/^[•\-*]\s*/,"").trim(); }).filter(Boolean).join(", ");
+
+    var expRaw = sectionBody(["experience","employment","work history"]);
+    var experience = [];
+    if (expRaw){
+      var chunks = expRaw.split(/\n\s*\n/).filter(function(c){ return c.trim().length > 8; });
+      chunks.slice(0, 8).forEach(function(c){
+        var cl = c.split("\n").map(function(x){ return x.trim(); }).filter(Boolean);
+        if (!cl.length) return;
+        var head = cl[0].replace(/^[•\-*]\s*/,"");
+        var role = head, company = "", dates = "";
+        var dm = head.match(/^(.*?)\s*[—–|@-]\s*(.*?)\s*(\(?\d{4}.*)?$/);
+        if (dm){ role = (dm[1]||"").trim(); company = (dm[2]||"").trim(); dates = (dm[3]||"").replace(/[()]/g,"").trim(); }
+        var bullets = cl.slice(1).map(function(x){ return x.replace(/^[•\-*]\s*/,""); }).join("\n");
+        experience.push({ role: role.slice(0,80), company: company.slice(0,80), start: dates, end: "", bullets: bullets.slice(0,1200) });
+      });
+    }
+    var eduRaw = sectionBody(["education","academic","qualification"]);
+    var education = [];
+    if (eduRaw){
+      eduRaw.split("\n").filter(Boolean).slice(0,4).forEach(function(l){
+        education.push({ degree: l.replace(/^[•\-*]\s*/,"").slice(0,120), institution:"", location:"", years:"", score:"" });
+      });
+    }
+    return { personal: personal, skills: skills, experience: experience, education: education, projects: [] };
+  }
+
+  /* ---------- boot ---------- */
+  (async function(){
+    await initAuth();
+    await refresh();
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Templates — ResuMate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --navy:#0F172A; --slate:#475569; --slate-light:#64748B; --faint:#94A3B8;
+    --blue:#2563EB; --violet:#7C3AED;
+    --grad:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);
+    --cream:#FDF3E7; --line:#E9EEF4; --line-warm:#EFE6D8;
+    --shadow:0 18px 40px rgba(15,23,42,.08);
+    --shadow-lg:0 28px 60px rgba(15,23,42,.13);
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--slate);background:#fff;line-height:1.6;font-size:16px}
+  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;color:var(--navy);line-height:1.15;font-weight:600}
+  a{text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto}
+  .section{padding:88px 24px}
+  .section-cream{background:var(--cream)}
+  .eyebrow{text-align:center;font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);margin-bottom:14px}
+  .section-title{text-align:center;font-size:40px;letter-spacing:-.01em;max-width:760px;margin:0 auto}
+  .section-sub{text-align:center;max-width:620px;margin:16px auto 0;font-size:16.5px}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .blue-text{color:var(--blue)}
+
+  /* ---------- Buttons ---------- */
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid transparent;cursor:pointer;transition:transform .18s,box-shadow .18s;font-family:'Inter',sans-serif}
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(99,73,237,.28)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(99,73,237,.34)}
+  .btn-outline{background:#fff;border-color:#CBD5E1;color:var(--navy)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+  .btn-sm{padding:9px 20px;font-size:14px}
+
+  /* ---------- Header ---------- */
+  .site-header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid #EEF2F7}
+  .header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:28px}
+  .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .logo-mark{width:38px;height:38px;border-radius:11px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:21px;box-shadow:0 6px 14px rgba(99,73,237,.3)}
+  .logo-text{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+  .logo-text em{font-style:normal;color:var(--blue)}
+  .main-nav{display:flex;align-items:center;gap:26px;margin-left:auto}
+  .main-nav>a,.nav-item>a{color:var(--navy);font-size:14.5px;font-weight:500;white-space:nowrap}
+  .main-nav a:hover{color:var(--blue)}
+  .nav-item{position:relative;padding:6px 0}
+  .nav-item>a{display:inline-flex;align-items:center;gap:5px}
+  .nav-item>a::after{content:"▾";font-size:10px;color:var(--faint)}
+  .dropdown{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:8px;min-width:230px;opacity:0;visibility:hidden;transition:.18s}
+  .nav-item:hover .dropdown{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+  .dropdown a{display:block;padding:9px 12px;border-radius:10px;color:var(--slate);font-size:14px;font-weight:500}
+  .dropdown a:hover{background:#EFF6FF;color:var(--blue)}
+  .header-cta{margin-left:8px}
+
+  /* ---------- Gallery ---------- */
+  .gallery-head{padding:72px 24px 8px;text-align:center}
+  .gallery-head h1{font-size:44px;letter-spacing:-.01em;max-width:720px;margin:0 auto}
+  .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:24px;margin-top:52px}
+  .gal-card{background:#fff;border:1px solid var(--line-warm);border-radius:22px;padding:18px;box-shadow:0 10px 26px rgba(120,84,20,.05);transition:transform .18s,box-shadow .18s;display:flex;flex-direction:column}
+  .gal-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+  .gal-name{font-weight:700;color:var(--navy);font-size:16.5px;margin:16px 0 4px}
+  .gal-best{font-size:13.5px;color:var(--slate-light);margin-bottom:16px;line-height:1.5}
+  .gal-card .btn{margin-top:auto;justify-content:center}
+
+  /* ---------- Mini resume previews ---------- */
+  .mini{background:#fff;border:1px solid #E8EDF3;border-radius:12px;overflow:hidden;aspect-ratio:210/272;display:flex;flex-direction:column;font-size:9.5px;line-height:1.45;color:#475569;box-shadow:0 6px 16px rgba(15,23,42,.05)}
+  .mini .m-name{font-size:14.5px;font-weight:700;line-height:1.2}
+  .mini .m-title{font-size:9.5px;font-weight:600}
+  .mini .m-contact{font-size:8.3px;opacity:.85}
+  .mini .m-sec{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:8px 0 3px}
+  .mini .m-body{padding:9px 13px 11px;flex:1}
+  .mini p{font-size:9.3px;line-height:1.5}
+  .mini .m-job{font-weight:700;color:#1E293B;font-size:9.8px}
+  .mini .m-meta{font-size:8.4px;color:#94A3B8}
+  .mini ul{margin:2px 0 0 11px;font-size:9.2px}
+  .mini li{margin-bottom:1px}
+  .mini .m-skills{font-size:9.2px}
+
+  .mini-creative .m-head{background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;padding:11px 13px}
+  .mini-creative .m-title{color:#FBCFE8}
+  .mini-creative .m-sec{color:#7C3AED}
+  .mini-creative .m-name{font-family:'Fraunces',serif}
+
+  .mini-engineering-fresher .m-head{background:#2563EB;color:#fff;padding:11px 13px}
+  .mini-engineering-fresher .m-title{color:#BFDBFE}
+  .mini-engineering-fresher .m-sec{color:#2563EB;border-bottom:1.5px solid #DBEAFE;padding-bottom:2px}
+
+  .mini-corporate-modern .m-head{background:#0F172A;color:#fff;padding:11px 13px}
+  .mini-corporate-modern .m-title{color:#93C5FD}
+  .mini-corporate-modern .m-sec{color:#2563EB}
+
+  .mini-business-executive .m-head{background:#334155;color:#fff;padding:11px 13px;border-bottom:3px solid #D97706}
+  .mini-business-executive .m-title{color:#FCD34D}
+  .mini-business-executive .m-sec{color:#334155;font-family:'Fraunces',serif;letter-spacing:.05em}
+  .mini-business-executive .m-name{font-family:'Fraunces',serif}
+
+  .mini-management-professional .m-head{background:linear-gradient(135deg,#0D9488,#2563EB);color:#fff;padding:11px 13px}
+  .mini-management-professional .m-title{color:#CCFBF1}
+  .mini-management-professional .m-sec{color:#0D9488}
+
+  .mini-modern-simple .m-head{background:#fff;color:#0F172A;padding:12px 13px 7px;border-bottom:1px solid #E2E8F0}
+  .mini-modern-simple .m-title{color:#64748B}
+  .mini-modern-simple .m-contact{color:#94A3B8}
+  .mini-modern-simple .m-sec{color:#64748B}
+
+  .mini-corporate-basic .m-head{background:#111827;color:#fff;padding:11px 13px}
+  .mini-corporate-basic .m-title{color:#D1D5DB}
+  .mini-corporate-basic .m-sec{color:#111827;border-bottom:1px solid #111827;padding-bottom:2px}
+
+  .mini-double{display:flex;flex-direction:row}
+  .mini-double .m-side{background:#1E3A5F;color:#DBEAFE;width:36%;padding:11px 10px;flex-shrink:0}
+  .mini-double .m-side .m-name{color:#fff;font-size:12.5px}
+  .mini-double .m-side .m-title{color:#93C5FD;margin-bottom:8px}
+  .mini-double .m-side .m-sec{color:#93C5FD}
+  .mini-double .m-side p,.mini-double .m-side li{color:#CBD5E1;font-size:8.8px}
+  .mini-double .m-main{flex:1;padding:9px 12px 11px}
+  .mini-double .m-sec{color:#1E3A5F}
+
+  /* ---------- Footer ---------- */
+  .site-footer{border-top:1px solid #EEF2F7;background:#fff;padding:64px 24px 0;margin-top:0}
+  .footer-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:44px}
+  .footer-tag{font-size:14.5px;margin-top:14px;max-width:280px}
+  .footer-col h4{font-family:'Inter',sans-serif;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin-bottom:18px}
+  .footer-col a{display:block;color:var(--slate);font-size:14.5px;margin-bottom:11px}
+  .footer-col a:hover{color:var(--blue)}
+  .footer-bottom{max-width:1200px;margin:52px auto 0;border-top:1px solid #EEF2F7;padding:22px 0;text-align:center;color:var(--faint);font-size:13.5px}
+
+  @media (max-width:960px){
+    .section-title{font-size:32px}
+    .section{padding:64px 20px}
+    .gallery-head h1{font-size:34px}
+    .footer-grid{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:860px){
+    .main-nav>a,.main-nav .nav-item{display:none}
+    .main-nav{margin-left:auto}
+  }
+  @media (max-width:560px){
+    .footer-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index">
+      <span class="logo-mark">R</span>
+      <span class="logo-text">Resu<em>Mate</em></span>
+    </a>
+    <nav class="main-nav">
+      <div class="nav-item">
+        <a href="#">Engineering Resumes</a>
+        <div class="dropdown">
+          <a href="#">Computer Science Resume</a>
+          <a href="#">Electronics Resume</a>
+          <a href="#">Mechanical Resume</a>
+          <a href="#">Civil Resume</a>
+          <a href="#">Engineering Fresher Resume</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="#">Management Resumes</a>
+        <div class="dropdown">
+          <a href="#">MBA Resume</a>
+          <a href="#">BBA Resume</a>
+          <a href="#">Business Analyst Resume</a>
+          <a href="#">Product Manager Resume</a>
+        </div>
+      </div>
+      <a href="templates">Templates</a>
+      <a href="dashboard">My Resumes</a>
+      <div class="nav-item">
+        <a href="#">AI Career Tools</a>
+        <div class="dropdown">
+          <a href="ats-checker">AI ATS Score Checker</a>
+          <a href="#">AI Resume Optimizer</a>
+          <a href="#">AI Job Scan</a>
+          <a href="#">AI Resume Review</a>
+          <a href="interview-coach">AI Resume Interviewer</a>
+        </div>
+      </div>
+    </nav>
+    <a class="btn btn-primary btn-sm header-cta" href="login">Sign In</a>
+  </div>
+</header>
+
+<!-- ================= GALLERY ================= -->
+<section class="section section-cream" style="padding-top:0">
+  <div class="wrap">
+    <div class="gallery-head">
+      <div class="eyebrow">Resume Templates</div>
+      <h1>Pick a design. <span class="grad-text">Make it yours.</span></h1>
+      <p class="section-sub">Eight ATS-friendly templates for freshers and experienced professionals. Choose one to open it in the builder — you can switch anytime.</p>
+    </div>
+
+    <div class="gallery-grid">
+
+      <!-- Creative -->
+      <div class="gal-card">
+        <div class="mini mini-creative">
+          <div class="m-head">
+            <div class="m-name">Aarav Verma</div>
+            <div class="m-title">Software Engineer</div>
+            <div class="m-contact">aarav.verma@example.com · +91 98765 43210 · Bengaluru</div>
+          </div>
+          <div class="m-body">
+            <div class="m-sec">Summary</div>
+            <p>Software engineer with 2+ years building web apps with React and Node.js. Loves clean code and fast, accessible interfaces.</p>
+            <div class="m-sec">Skills</div>
+            <p class="m-skills">JavaScript · React · Node.js · SQL · Git · Docker</p>
+            <div class="m-sec">Experience</div>
+            <div class="m-job">Software Engineer — TechNova Solutions</div>
+            <div class="m-meta">Jan 2024 – Present</div>
+            <ul><li>Built customer dashboard used by 20k+ users</li><li>Cut page load time by 35%</li></ul>
+            <div class="m-sec">Education</div>
+            <p>B.Tech, Computer Science — VTU, 2020 – 2024 · CGPA 8.7</p>
+          </div>
+        </div>
+        <div class="gal-name">Creative</div>
+        <p class="gal-best">Bold gradient header — great for design, media and startup roles.</p>
+        <button type="button" class="btn btn-primary btn-sm use-tpl" data-template="creative">Use Template</button>
+      </div>
+
+      <!-- Engineering Fresher -->
+      <div class="gal-card">
+        <div class="mini mini-engineering-fresher">
+          <div class="m-head">
+            <div class="m-name">Aarav Verma</div>
+            <div class="m-title">Software Engineer</div>
+            <div class="m-contact">aarav.verma@example.com · +91 98765 43210 · Bengaluru</div>
+          </div>
+          <div class="m-body">
+            <div class="m-sec">Summary</div>
+            <p>Software engineer with 2+ years building web apps with React and Node.js. Loves clean code and fast, accessible interfaces.</p>
+            <div class="m-sec">Skills</div>
+            <p class="m-skills">JavaScript · React · Node.js · SQL · Git · Docker</p>
+            <div class="m-sec">Experience</div>
+            <div class="m-job">Software Engineer — TechNova Solutions</div>
+            <div class="m-meta">Jan 2024 – Present</div>
+            <ul><li>Built customer dashboard used by 20k+ users</li><li>Cut page load time by 35%</li></ul>
+            <div class="m-sec">Education</div>
+            <p>B.Tech, Computer Science — VTU, 2020 – 2024 · CGPA 8.7</p>
+          </div>
+        </div>
+        <div class="gal-name">Engineering Fresher</div>
+        <p class="gal-best">Clean blue structure that puts projects and skills first for freshers.</p>
+        <button type="button" class="btn btn-primary btn-sm use-tpl" data-template="engineering-fresher">Use Template</button>
+      </div>
+
+      <!-- Corporate Modern -->
+      <div class="gal-card">
+        <div class="mini mini-corporate-modern">
+          <div class="m-head">
+            <div class="m-name">Aarav Verma</div>
+            <div class="m-title">Software Engineer</div>
+            <div class="m-contact">aarav.verma@example.com · +91 98765 43210 · Bengaluru</div>
+          </div>
+          <div class="m-body">
+            <div class="m-sec">Summary</div>
+            <p>Software engineer with 2+ years building web apps with React and Node.js. Loves clean code and fast, accessible interfaces.</p>
+            <div class="m-sec">Skills</div>
+            <p class="m-skills">JavaScript · React · Node.js · SQL · Git · Docker</p>
+            <div class="m-sec">Experience</div>
+            <div class="m-job">Software Engineer — TechNova Solutions</div>
+            <div class="m-meta">Jan 2024 – Present</div>
+            <ul><li>Built customer dashboard used by 20k+ users</li><li>Cut page load time by 35%</li></ul>
+            <div class="m-sec">Education</div>
+            <p>B.Tech, Computer Science — VTU, 2020 – 2024 · CGPA 8.7</p>
+          </div>
+        </div>
+        <div class="gal-name">Corporate Modern</div>
+        <p class="gal-best">Sharp navy header — a safe, polished pick for IT and corporate roles.</p>
+        <button type="button" class="btn btn-primary btn-sm use-tpl" data-template="corporate-modern">Use Template</button>
+      </div>
+
+      <!-- Business Executive -->
+      <div class="gal-card">
+        <div class="mini mini-business-executive">
+          <div class="m-head">
+            <div class="m-name">Aarav Verma</div>
+            <div class="m-title">Software Engineer</div>
+            <div class="m-contact">aarav.verma@example.com · +91 98765 43210 · Bengaluru</div>
+          </div>
+          <div class="m-body">
+            <div class="m-sec">Summary</div>
+            <p>Software engineer with 2+ years building web apps with React and Node.js. Loves clean code and fast, accessible interfaces.</p>
+            <div class="m-sec">Skills</div>
+            <p class="m-skills">JavaScript · React · Node.js · SQL · Git · Docker</p>
+            <div class="m-sec">Experience</div>
+            <div class="m-job">Software Engineer — TechNova Solutions</div>
+            <div class="m-meta">Jan 2024 – Present</div>
+            <ul><li>Built customer dashboard used by 20k+ users</li><li>Cut page load time by 35%</li></ul>
+            <div class="m-sec">Education</div>
+            <p>B.Tech, Computer Science — VTU, 2020 – 2024 · CGPA 8.7</p>
+          </div>
+        </div>
+        <div class="gal-name">Business Executive</div>
+        <p class="gal-best">Serif type with a gold rule — for senior and leadership profiles.</p>
+        <button type="button" class="btn btn-primary btn-sm use-tpl" data-template="business-executive">Use Template</button>
+      </div>
+
+      <!-- Sophisticated Double Column -->
+      <div class="gal-card">
+        <div class="mini mini-double">
+          <div class="m-side">
+            <div class="m-name">Aarav Verma</div>
+            <div class="m-title">Software Engineer</div>
+            <div class="m-sec">Contact</div>
+            <p>aarav.verma@example.com<br>+91 98765 43210<br>Bengaluru, India</p>
+            <div class="m-sec">Skills</div>
+            <p>JavaScript · React · Node.js · SQL · Git · Docker</p>
+          </div>
+          <div class="m-main">
+            <div class="m-sec" style="margin-top:0">Summary</div>
+            <p>Software engineer with 2+ years building web apps with React and Node.js. Loves clean code and fast interfaces.</p>
+            <div class="m-sec">Experience</div>
+            <div class="m-job">Software Engineer — TechNova</div>
+            <div class="m-meta">Jan 2024 – Present</div>
+            <ul><li>Built dashboard used by 20k+ users</li><li>Cut page load time by 35%</li></ul>
+            <div class="m-sec">Education</div>
+            <p>B.Tech, CS — VTU, 2020 – 2024 · CGPA 8.7</p>
+          </div>
+        </div>
+        <div class="gal-name">Sophisticated Double Column</div>
+        <p class="gal-best">Sidebar layout that packs more in — ideal for experienced professionals.</p>
+        <button type="button" class="btn btn-primary btn-sm use-tpl" data-template="double-column">Use Template</button>
+      </div>
+
+      <!-- Management Professional -->
+      <div class="gal-card">
+        <div class="mini mini-management-professional">
+          <div class="m-head">
+            <div class="m-name">Aarav Verma</div>
+            <div class="m-title">Software Engineer</div>
+            <div class="m-contact">aarav.verma@example.com · +91 98765 43210 · Bengaluru</div>
+          </div>
+          <div class="m-body">
+            <div class="m-sec">Summary</div>
+            <p>Software engineer with 2+ years building web apps with React and Node.js. Loves clean code and fast, accessible interfaces.</p>
+            <div class="m-sec">Skills</div>
+            <p class="m-skills">JavaScript · React · Node.js · SQL · Git · Docker</p>
+            <div class="m-sec">Experience</div>
+            <div class="m-job">Software Engineer — TechNova Solutions</div>
+            <div class="m-meta">Jan 2024 – Present</div>
+            <ul><li>Built customer dashboard used by 20k+ users</li><li>Cut page load time by 35%</li></ul>
+            <div class="m-sec">Education</div>
+            <p>B.Tech, Computer Science — VTU, 2020 – 2024 · CGPA 8.7</p>
+          </div>
+        </div>
+        <div class="gal-name">Management Professional</div>
+        <p class="gal-best">Teal-to-blue gradient — made for MBA and business profiles.</p>
+        <button type="button" class="btn btn-primary btn-sm use-tpl" data-template="management-professional">Use Template</button>
+      </div>
+
+      <!-- Modern Simple -->
+      <div class="gal-card">
+        <div class="mini mini-modern-simple">
+          <div class="m-head">
+            <div class="m-name">Aarav Verma</div>
+            <div class="m-title">Software Engineer</div>
+            <div class="m-contact">aarav.verma@example.com · +91 98765 43210 · Bengaluru</div>
+          </div>
+          <div class="m-body">
+            <div class="m-sec">Summary</div>
+            <p>Software engineer with 2+ years building web apps with React and Node.js. Loves clean code and fast, accessible interfaces.</p>
+            <div class="m-sec">Skills</div>
+            <p class="m-skills">JavaScript · React · Node.js · SQL · Git · Docker</p>
+            <div class="m-sec">Experience</div>
+            <div class="m-job">Software Engineer — TechNova Solutions</div>
+            <div class="m-meta">Jan 2024 – Present</div>
+            <ul><li>Built customer dashboard used by 20k+ users</li><li>Cut page load time by 35%</li></ul>
+            <div class="m-sec">Education</div>
+            <p>B.Tech, Computer Science — VTU, 2020 – 2024 · CGPA 8.7</p>
+          </div>
+        </div>
+        <div class="gal-name">Modern Simple</div>
+        <p class="gal-best">No colour bar, just type — minimal and extremely ATS-safe.</p>
+        <button type="button" class="btn btn-primary btn-sm use-tpl" data-template="modern-simple">Use Template</button>
+      </div>
+
+      <!-- Corporate Basic -->
+      <div class="gal-card">
+        <div class="mini mini-corporate-basic">
+          <div class="m-head">
+            <div class="m-name">Aarav Verma</div>
+            <div class="m-title">Software Engineer</div>
+            <div class="m-contact">aarav.verma@example.com · +91 98765 43210 · Bengaluru</div>
+          </div>
+          <div class="m-body">
+            <div class="m-sec">Summary</div>
+            <p>Software engineer with 2+ years building web apps with React and Node.js. Loves clean code and fast, accessible interfaces.</p>
+            <div class="m-sec">Skills</div>
+            <p class="m-skills">JavaScript · React · Node.js · SQL · Git · Docker</p>
+            <div class="m-sec">Experience</div>
+            <div class="m-job">Software Engineer — TechNova Solutions</div>
+            <div class="m-meta">Jan 2024 – Present</div>
+            <ul><li>Built customer dashboard used by 20k+ users</li><li>Cut page load time by 35%</li></ul>
+            <div class="m-sec">Education</div>
+            <p>B.Tech, Computer Science — VTU, 2020 – 2024 · CGPA 8.7</p>
+          </div>
+        </div>
+        <div class="gal-name">Corporate Basic</div>
+        <p class="gal-best">Classic black-and-white format recruiters have trusted for years.</p>
+        <button type="button" class="btn btn-primary btn-sm use-tpl" data-template="corporate-basic">Use Template</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <a class="logo" href="index">
+        <span class="logo-mark">R</span>
+        <span class="logo-text">Resu<em>Mate</em></span>
+      </a>
+      <p class="footer-tag">The AI-native resume workspace. Built for ATS. Designed for offers.</p>
+    </div>
+    <div class="footer-col">
+      <h4>AI Tools</h4>
+      <a href="ats-checker">AI ATS Score Checker</a>
+      <a href="#">AI Resume Optimizer</a>
+      <a href="#">AI Job Scan</a>
+      <a href="interview-coach">AI Resume Interviewer</a>
+      <a href="#">AI Negotiation Coach</a>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="templates">Templates</a>
+      <a href="dashboard">My Resumes</a>
+      <a href="#">Examples</a>
+      <a href="#">Career Resources</a>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <a href="login">Sign In</a>
+      <a href="#">My Account</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Refund &amp; Cancellation</a>
+      <a href="#">Shipping</a>
+      <a href="#">Contact Us</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 ResuMate. All rights reserved.</div>
+</footer>
+
+<script>
+(function () {
+  var buttons = document.querySelectorAll(".use-tpl");
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function () {
+      try {
+        localStorage.setItem("resumate_selected_template", this.getAttribute("data-template"));
+      } catch (e) { /* storage unavailable — builder will use the default */ }
+      window.location.href = "builder";
+    });
+  }
+})();
+</script>
+</body>
+</html>

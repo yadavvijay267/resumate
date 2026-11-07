@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS Score Checker — ResuMate</title>
+<meta name="description" content="Check how well your resume passes Applicant Tracking Systems. Free ATS score with actionable fixes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --navy:#0F172A; --slate:#475569; --slate-light:#64748B; --faint:#94A3B8;
+    --blue:#2563EB; --violet:#7C3AED;
+    --grad:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);
+    --cream:#FDF3E7; --line:#E9EEF4;
+    --green:#15803D; --green-bg:#F0FDF4;
+    --amber:#B45309; --amber-bg:#FFFBEB;
+    --red:#DC2626; --red-bg:#FEF2F2;
+    --shadow:0 18px 40px rgba(15,23,42,.08);
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--slate);background:#FBFCFE;line-height:1.6;font-size:16px}
+  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;color:var(--navy);line-height:1.15;font-weight:600}
+  a{text-decoration:none}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid transparent;cursor:pointer;transition:transform .18s,box-shadow .18s;font-family:'Inter',sans-serif;background:#fff;color:var(--navy)}
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(99,73,237,.28)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(99,73,237,.34)}
+  .btn-outline{background:#fff;border-color:#CBD5E1;color:var(--navy)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+  .btn-sm{padding:9px 20px;font-size:14px}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+  .site-header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid #EEF2F7}
+  .header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:28px}
+  .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .logo-mark{width:38px;height:38px;border-radius:11px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:21px;box-shadow:0 6px 14px rgba(99,73,237,.3)}
+  .logo-text{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+  .logo-text em{font-style:normal;color:var(--blue)}
+  .main-nav{display:flex;align-items:center;gap:26px;margin-left:auto}
+  .main-nav>a{color:var(--navy);font-size:14.5px;font-weight:500;white-space:nowrap}
+  .main-nav a:hover{color:var(--blue)}
+  .main-nav a.active{color:var(--blue);font-weight:700}
+  .header-cta{margin-left:8px}
+
+  .wrap{max-width:1060px;margin:0 auto;padding:56px 24px 90px}
+  .hero{text-align:center;max-width:720px;margin:0 auto 40px}
+  .hero h1{font-size:44px;margin-bottom:14px}
+  .hero p{font-size:17px;color:var(--slate-light)}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:30px}
+  .input-card{margin-bottom:28px}
+  .input-tabs{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .tab-btn{padding:10px 20px;border-radius:999px;border:1px solid #E2E8F0;background:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--slate);cursor:pointer;transition:.15s}
+  .tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+  textarea#resumeInput{width:100%;min-height:280px;border:1px solid #E2E8F0;border-radius:16px;padding:18px;font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.7;color:var(--navy);resize:vertical;outline:none;background:#FDFEFF}
+  textarea#resumeInput:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+  .drop-zone{border:2px dashed #CBD5E1;border-radius:16px;padding:44px 24px;text-align:center;color:var(--slate-light);cursor:pointer;transition:.15s;background:#FDFEFF;display:none}
+  .drop-zone:hover,.drop-zone.over{border-color:var(--blue);background:#F5F8FF}
+  .drop-zone strong{color:var(--navy);display:block;margin-bottom:6px;font-size:16px}
+  .input-actions{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;align-items:center}
+  .char-count{margin-left:auto;font-size:13px;color:var(--faint)}
+
+  #results{display:none}
+  .score-hero{display:grid;grid-template-columns:280px 1fr;gap:34px;align-items:center;margin-bottom:28px}
+  @media(max-width:760px){.score-hero{grid-template-columns:1fr;text-align:center}}
+  .gauge-wrap{position:relative;width:240px;height:240px;margin:0 auto}
+  .gauge-wrap svg{transform:rotate(-90deg)}
+  .gauge-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge-num b{font-family:'Fraunces',serif;font-size:64px;color:var(--navy);line-height:1}
+  .gauge-num span{font-size:13px;color:var(--slate-light);font-weight:600;margin-top:6px}
+  .verdict h2{font-size:30px;margin-bottom:10px}
+  .verdict p{color:var(--slate-light);font-size:15.5px;max-width:520px}
+  .verdict .pill{display:inline-block;padding:6px 16px;border-radius:999px;font-size:13px;font-weight:700;margin-bottom:12px}
+  .pill.good{background:var(--green-bg);color:var(--green)}
+  .pill.ok{background:var(--amber-bg);color:var(--amber)}
+  .pill.bad{background:var(--red-bg);color:var(--red)}
+
+  .breakdown{display:grid;gap:14px;margin-bottom:28px}
+  .check-row{display:grid;grid-template-columns:34px 1fr auto;gap:14px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .check-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0}
+  .check-icon.good{background:var(--green-bg);color:var(--green)}
+  .check-icon.ok{background:var(--amber-bg);color:var(--amber)}
+  .check-icon.bad{background:var(--red-bg);color:var(--red)}
+  .check-body h3{font-size:16.5px;margin-bottom:4px;font-family:'Inter',sans-serif;font-weight:700}
+  .check-body p{font-size:14px;color:var(--slate-light)}
+  .check-body ul{margin:8px 0 0 18px;font-size:13.5px;color:var(--slate)}
+  .check-body li{margin-bottom:4px}
+  .check-score{font-family:'Fraunces',serif;font-size:22px;color:var(--navy);white-space:nowrap}
+  .check-score small{font-size:13px;color:var(--faint);font-family:'Inter',sans-serif}
+
+  .tips{background:var(--cream);border:1px solid var(--line-warm,#EFE6D8);border-radius:22px;padding:30px;margin-bottom:28px}
+  .tips h2{font-size:24px;margin-bottom:14px}
+  .tips ol{margin-left:20px;color:var(--slate);font-size:15px}
+  .tips li{margin-bottom:10px}
+  .tips b{color:var(--navy)}
+
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+  footer{border-top:1px solid var(--line);padding:34px 24px;text-align:center;color:var(--faint);font-size:13.5px}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index"><span class="logo-mark">R</span><span class="logo-text">Resu<em>Mate</em></span></a>
+    <nav class="main-nav">
+      <a href="index">Home</a>
+      <a href="templates">Templates</a>
+      <a href="ats-checker" class="active">ATS Checker</a>
+      <a href="interview-coach">Interview Coach</a>
+      <a href="pricing">Pricing</a>
+      <a href="dashboard">My Resumes</a>
+    </nav>
+    <a href="builder" class="btn btn-primary btn-sm header-cta">Build Resume</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>ATS Score <span class="grad-text">Checker</span></h1>
+    <p>Paste your resume below and get an instant score on how well it passes Applicant Tracking Systems — with exact fixes, free.</p>
+  </div>
+
+  <div class="card input-card">
+    <div class="input-tabs">
+      <button class="tab-btn active" data-tab="paste" type="button">✏️ Paste text</button>
+      <button class="tab-btn" data-tab="upload" type="button">📄 Upload .txt</button>
+      <button class="tab-btn" data-tab="builder" type="button">🧩 From my builder</button>
+    </div>
+    <textarea id="resumeInput" placeholder="Paste your full resume text here…
+
+Tip: copy everything from your resume — name, contact, summary, experience, education, skills."></textarea>
+    <div class="drop-zone" id="dropZone">
+      <strong>Drop your .txt resume here</strong>
+      or click to choose a file
+      <input type="file" id="fileInput" accept=".txt,.md" hidden>
+    </div>
+    <div class="input-actions">
+      <button class="btn btn-primary" id="checkBtn" type="button">Check my score →</button>
+      <button class="btn btn-outline btn-sm" id="sampleBtn" type="button">Try a sample</button>
+      <span class="char-count" id="charCount">0 characters</span>
+    </div>
+  </div>
+
+  <div id="results">
+    <div class="card score-hero">
+      <div class="gauge-wrap">
+        <svg width="240" height="240" viewBox="0 0 240 240">
+          <circle cx="120" cy="120" r="104" fill="none" stroke="#EEF2F7" stroke-width="18"/>
+          <circle id="gaugeArc" cx="120" cy="120" r="104" fill="none" stroke="url(#gaugeGrad)" stroke-width="18"
+                  stroke-linecap="round" stroke-dasharray="653.4" stroke-dashoffset="653.4"/>
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2563EB"/><stop offset="100%" stop-color="#7C3AED"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="gauge-num"><b id="scoreNum">0</b><span>ATS SCORE</span></div>
+      </div>
+      <div class="verdict">
+        <span class="pill" id="verdictPill">—</span>
+        <h2 id="verdictTitle">—</h2>
+        <p id="verdictText">—</p>
+      </div>
+    </div>
+
+    <h2 style="font-size:24px;margin:0 0 16px">Detailed breakdown</h2>
+    <div class="breakdown" id="breakdown"></div>
+
+    <div class="tips">
+      <h2>Quick wins to raise your score</h2>
+      <ol id="tipsList"></ol>
+    </div>
+
+    <div class="cta-row">
+      <a href="builder" class="btn btn-primary">Fix it in the builder →</a>
+      <a href="templates" class="btn btn-outline">Browse ATS-friendly templates</a>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 ResuMate — Your Next Career Starts Here.</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var input = $("resumeInput"), checkBtn = $("checkBtn"), results = $("results");
+
+  /* ---------- tabs ---------- */
+  var tabs = document.querySelectorAll(".tab-btn");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){ x.classList.remove("active"); });
+      t.classList.add("active");
+      var mode = t.getAttribute("data-tab");
+      input.style.display = mode === "upload" ? "none" : "block";
+      $("dropZone").style.display = mode === "upload" ? "block" : "none";
+      if (mode === "builder") loadFromBuilder();
+    });
+  });
+
+  /* ---------- char count ---------- */
+  input.addEventListener("input", function(){
+    $("charCount").textContent = input.value.length.toLocaleString() + " characters";
+  });
+
+  /* ---------- upload ---------- */
+  var dz = $("dropZone"), fi = $("fileInput");
+  dz.addEventListener("click", function(){ fi.click(); });
+  ["dragover","dragenter"].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.remove("over"); }); });
+  dz.addEventListener("drop", function(e){
+    var f = e.dataTransfer.files[0];
+    if (f) readFile(f);
+  });
+  fi.addEventListener("change", function(){ if (fi.files[0]) readFile(fi.files[0]); });
+  function readFile(f){
+    var r = new FileReader();
+    r.onload = function(){ input.value = String(r.result || "").slice(0, 20000); input.dispatchEvent(new Event("input")); switchTab("paste"); };
+    r.readAsText(f);
+  }
+  function switchTab(mode){
+    tabs.forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-tab") === mode); });
+    input.style.display = mode === "upload" ? "none" : "block";
+    dz.style.display = mode === "upload" ? "block" : "none";
+  }
+
+  /* ---------- sample ---------- */
+  $("sampleBtn").addEventListener("click", function(){
+    input.value = SAMPLE_RESUME;
+    input.dispatchEvent(new Event("input"));
+    switchTab("paste");
+    input.focus();
+  });
+
+  /* ---------- from builder ---------- */
+  function resumeToText(r){
+    var L = [];
+    var p = r.personal || {};
+    if (p.name) L.push(p.name);
+    if (p.title) L.push(p.title);
+    var contact = [p.email, p.phone, p.location, p.linkedin, p.github].filter(Boolean).join(" | ");
+    if (contact) L.push(contact);
+    L.push("");
+    if (p.summary){ L.push("SUMMARY"); L.push(p.summary); L.push(""); }
+    if (r.experience && r.experience.length){
+      L.push("EXPERIENCE");
+      r.experience.forEach(function(e){
+        L.push((e.role||"") + (e.company ? " — " + e.company : "") + " (" + [e.start,e.end].filter(Boolean).join(" - ") + ")");
+        if (e.bullets) L.push(e.bullets);
+        L.push("");
+      });
+    }
+    if (r.education && r.education.length){
+      L.push("EDUCATION");
+      r.education.forEach(function(e){
+        L.push([e.degree, e.institution, e.years].filter(Boolean).join(", "));
+      });
+      L.push("");
+    }
+    if (r.skills){ L.push("SKILLS"); L.push(r.skills); }
+    if (r.projects && r.projects.length){
+      L.push(""); L.push("PROJECTS");
+      r.projects.forEach(function(pr){
+        L.push((pr.name||"") + (pr.tech ? " (" + pr.tech + ")" : ""));
+        if (pr.desc) L.push(pr.desc);
+      });
+    }
+    return L.join("\n");
+  }
+  function loadFromBuilder(){
+    try {
+      var pending = localStorage.getItem("resumate_ats_input");
+      if (pending){ localStorage.removeItem("resumate_ats_input"); input.value = pending; }
+      else {
+        var raw = localStorage.getItem("resumate_demo_resumes");
+        var list = raw ? JSON.parse(raw) : [];
+        if (list.length){ input.value = resumeToText(list[0]); }
+        else { input.value = ""; input.placeholder = "No resume found in the builder yet — build one first, or paste your text here."; }
+      }
+    } catch(e){ input.value = ""; }
+    input.dispatchEvent(new Event("input"));
+  }
+  /* auto-fill if builder sent text here */
+  try {
+    var pendingInit = localStorage.getItem("resumate_ats_input");
+    if (pendingInit){ localStorage.removeItem("resumate_ats_input"); input.value = pendingInit; input.dispatchEvent(new Event("input")); }
+  } catch(e){}
+
+  /* ============================================================
+     ATS ANALYSIS — 100 points across 7 checks (original logic)
+     ============================================================ */
+  var ACTION_VERBS = ("achieved administered analyzed approved built collaborated completed created delivered designed developed directed drove engineered established executed expanded generated grew implemented improved increased initiated innovated launched led managed mentored negotiated optimized orchestrated pioneered planned produced programmed reduced resolved revamped saved simplified spearheaded streamlined strengthened supervised tested trained transformed upgraded won automated boosted cut decreased doubled exceeded forecasted halved maximized minimized accelerated advised aligned audited budgeted championed coached coordinated crafted debugged deployed designed drafted enforced evaluated exceeded founded guided hired identified integrated investigated judged launched maintained marketed measured merged moderated motivated navigated organized oversaw performed pitched presented proposed published ranked raised ranked recruited redesigned refined researched restructured revived scaled scheduled secured selected shaped solved sourced specified strategized studied surveyed systematized tailored targeted taught tracked traded triaged tripled tuned turned validated verified visualized widened wired wrote").split(" ");
+
+  function analyze(text){
+    var t = text || "";
+    var lower = t.toLowerCase();
+    var words = t.trim().split(/\s+/).filter(Boolean);
+    var wc = words.length;
+    var lines = t.split("\n");
+    var checks = [];
+
+    function add(name, max, score, detail, tips){
+      checks.push({ name:name, max:max, score:Math.max(0, Math.min(max, Math.round(score))), detail:detail, tips:tips||[] });
+    }
+
+    /* 1 — Contact info (15) */
+    var hasEmail = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(t);
+    var hasPhone = /(\+\d[\d\s-]{7,}\d|\b\d{10}\b|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b)/.test(t.replace(/[\s-]/g, function(m){return m;}));
+    var hasPhone2 = /\+?\d[\d\s().-]{8,}\d/.test(t);
+    var hasLink = /linkedin\.com|github\.com|portfolio|behance\.net/i.test(t);
+    var cScore = (hasEmail?6:0) + (hasPhone2?5:0) + (hasLink?4:0);
+    var cTips = [];
+    if (!hasEmail) cTips.push("Add a professional email address at the top.");
+    if (!hasPhone2) cTips.push("Add your phone number with country code.");
+    if (!hasLink) cTips.push("Add your LinkedIn profile URL — recruiters expect it.");
+    add("Contact Information", 15, cScore,
+        "Email " + (hasEmail?"found":"missing") + " · Phone " + (hasPhone2?"found":"missing") + " · Profile link " + (hasLink?"found":"missing"),
+        cTips);
+
+    /* 2 — Sections (20) */
+    var secs = [
+      { re:/\b(summary|objective|profile)\b/i, label:"Summary" },
+      { re:/\b(experience|employment|work history|professional experience)\b/i, label:"Experience" },
+      { re:/\b(education|academic|qualification)\b/i, label:"Education" },
+      { re:/\b(skills|technical skills|competencies|expertise)\b/i, label:"Skills" }
+    ];
+    var foundSecs = secs.filter(function(s){ return s.re.test(t); });
+    var missingSecs = secs.filter(function(s){ return !s.re.test(t); }).map(function(s){ return s.label; });
+    var sTips = missingSecs.map(function(s){ return "Add a clear \"" + s + "\" section heading."; });
+    add("Clear Sections", 20, foundSecs.length * 5,
+        foundSecs.length + " of 4 standard sections detected" + (missingSecs.length ? " (" + missingSecs.join(", ") + " missing)" : ""),
+        sTips);
+
+    /* 3 — Action verbs (15) */
+    var verbHits = 0, seenVerbs = {};
+    lower.split(/[^a-z]+/).forEach(function(w){
+      if (ACTION_VERBS.indexOf(w) !== -1 && !seenVerbs[w]){ seenVerbs[w] = 1; verbHits++; }
+    });
+    var vScore = Math.min(15, verbHits * 1.5);
+    add("Strong Action Verbs", 15, vScore,
+        verbHits + " unique action verbs found" + (verbHits < 10 ? " (aim for 10+)" : ""),
+        verbHits < 10 ? ["Start bullets with verbs like Led, Built, Improved, Delivered, Launched."] : []);
+
+    /* 4 — Quantifiable results (15) */
+    var numHits = (t.match(/\d+(\.\d+)?\s*(%|percent|x|k|m\b)/gi) || []).length;
+    var moneyHits = (t.match(/[₹$€£]\s?[\d,]+/g) || []).length;
+    var qTotal = numHits + moneyHits;
+    var qScore = Math.min(15, qTotal * 3);
+    add("Measurable Achievements", 15, qScore,
+        qTotal + " quantified results found" + (qTotal < 5 ? " (aim for 5+)" : ""),
+        qTotal < 5 ? ["Add numbers: users, revenue, %, time saved — e.g. “Cut load time by 35%”."] : []);
+
+    /* 5 — Keywords & skills (15) */
+    var skillsLine = "";
+    var sm = t.match(/skills[:\s]*([^\n]+)/i);
+    if (sm) skillsLine = sm[1];
+    var commaSkills = (skillsLine.match(/,/g) || []).length;
+    var kScore = 0, kTips = [];
+    if (/skills/i.test(t)){ kScore += 5; } else { kTips.push("Add a dedicated Skills section — ATS parses it first."); }
+    if (commaSkills >= 4){ kScore += 5; } else { kTips.push("List 6–12 comma-separated skills (tools, languages, platforms)."); }
+    var buzz = (lower.match(/\b(agile|scrum|ci\/cd|rest api|machine learning|data analysis|cloud|aws|azure|docker|kubernetes|react|python|sql|excel|seo|leadership|communication|problem solving)\b/g) || []).length;
+    if (buzz >= 5){ kScore += 5; } else { kTips.push("Mirror keywords from the job posting — match their exact terms."); }
+    add("Keywords & Skills", 15, kScore,
+        (commaSkills + 1) + " skills listed · " + buzz + " industry keywords matched",
+        kTips);
+
+    /* 6 — Length & readability (10) */
+    var lScore = 0, lTips = [];
+    if (wc >= 300 && wc <= 900){ lScore += 6; }
+    else if (wc < 300){ lTips.push("Your resume is short (" + wc + " words) — flesh out experience bullets. Aim for 400–800 words."); }
+    else { lTips.push("Your resume is long (" + wc + " words) — trim to one page, ~400–800 words."); lScore += 2; }
+    var sentences = t.split(/[.!?\n]+/).filter(function(s){ return s.trim().split(/\s+/).length > 3; });
+    var avgLen = sentences.length ? sentences.join(" ").split(/\s+/).length / sentences.length : 0;
+    if (avgLen > 0 && avgLen <= 25){ lScore += 4; }
+    else if (avgLen > 25){ lTips.push("Shorten long sentences — keep bullets under ~25 words."); lScore += 1; }
+    add("Length & Readability", 10, lScore, wc + " words" + (avgLen ? " · avg " + Math.round(avgLen) + " words/sentence" : ""), lTips);
+
+    /* 7 — Formatting signals (10) */
+    var fScore = 10, fTips = [];
+    var bullets = (t.match(/^[\s]*[•\-\*▪▸]/gm) || []).length;
+    if (bullets < 3){ fScore -= 4; fTips.push("Use bullet points (•) for achievements — ATS reads them cleanly."); }
+    var allCapsLines = lines.filter(function(l){ var s=l.trim(); return s.length > 12 && s === s.toUpperCase() && /[A-Z]/.test(s); }).length;
+    if (allCapsLines > 6){ fScore -= 3; fTips.push("Avoid ALL-CAPS for whole lines — use it only for your name/headings."); }
+    if (/(click here|refer to attached|see portfolio)/i.test(t)){ fScore -= 3; fTips.push("Don't hide info behind links — put key facts in the text itself."); }
+    add("ATS-Friendly Formatting", 10, fScore,
+        bullets + " bullet points" + (allCapsLines > 6 ? " · too much ALL-CAPS" : ""),
+        fTips);
+
+    var total = checks.reduce(function(a,c){ return a + c.score; }, 0);
+    return { total: total, checks: checks, words: wc };
+  }
+
+  var SAMPLE_RESUME = "Aarav Verma\nSoftware Engineer\naarav.verma@example.com | +91 98765 43210 | Bengaluru, India | linkedin.com/in/aaravverma | github.com/aaravverma\n\nSUMMARY\nSoftware engineer with 2+ years of experience building web applications with React and Node.js. Focused on clean, reliable code and fast, accessible user experiences.\n\nEXPERIENCE\nSoftware Engineer — TechNova Solutions (Jan 2024 - Present)\n• Built a customer dashboard used by 20,000+ monthly users\n• Cut average page load time by 35% through code-splitting\n• Mentored 2 interns and reviewed pull requests for a team of 6\n\nEDUCATION\nB.Tech in Computer Science, Visvesvaraya Technological University, Bengaluru (2020 – 2024), CGPA: 8.7\n\nSKILLS\nJavaScript, React, Node.js, SQL, Git, Docker, AWS, CI/CD, Agile, REST API";
+
+  /* ---------- run ---------- */
+  checkBtn.addEventListener("click", function(){
+    var text = input.value.trim();
+    if (text.length < 80){
+      alert("Please paste your resume text first (at least a few lines).");
+      input.focus();
+      return;
+    }
+    var r = analyze(text);
+    renderResults(r);
+    results.style.display = "block";
+    results.scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+
+  function statusOf(pct){ return pct >= 80 ? "good" : pct >= 50 ? "ok" : "bad"; }
+
+  function renderResults(r){
+    /* gauge */
+    var arc = $("gaugeArc"), num = $("scoreNum");
+    var target = r.total, start = 0, t0 = null, dur = 1200;
+    var CIRC = 653.4;
+    function frame(ts){
+      if (!t0) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var v = Math.round(start + (target - start) * eased);
+      num.textContent = v;
+      arc.style.strokeDashoffset = CIRC - (CIRC * v / 100);
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    var pct = r.total;
+    var pill = $("verdictPill"), title = $("verdictTitle"), vtext = $("verdictText");
+    if (pct >= 80){
+      pill.className = "pill good"; pill.textContent = "Excellent";
+      title.textContent = "Your resume is ATS-ready.";
+      vtext.textContent = "Strong structure, measurable wins and the right keywords. Polish the small suggestions below and start applying with confidence.";
+    } else if (pct >= 50){
+      pill.className = "pill ok"; pill.textContent = "Needs work";
+      title.textContent = "Good foundation — a few fixes away.";
+      vtext.textContent = "Your resume has the basics, but ATS filters may still skip it. Work through the breakdown below, highest-impact first.";
+    } else {
+      pill.className = "pill bad"; pill.textContent = "At risk";
+      title.textContent = "Likely filtered out by ATS.";
+      vtext.textContent = "Most applicant tracking systems would struggle to parse this resume. Follow the fixes below — each one directly raises your score.";
+    }
+
+    /* breakdown */
+    var bd = $("breakdown"); bd.innerHTML = "";
+    var allTips = [];
+    r.checks.forEach(function(c){
+      var pctc = Math.round(c.score / c.max * 100);
+      var st = statusOf(pctc);
+      var icon = st === "good" ? "✓" : st === "ok" ? "!" : "✕";
+      var row = document.createElement("div");
+      row.className = "check-row";
+      var tipsHtml = c.tips.length ? "<ul>" + c.tips.map(function(x){ return "<li>" + x + "</li>"; }).join("") + "</ul>" : "";
+      row.innerHTML =
+        '<div class="check-icon ' + st + '">' + icon + '</div>' +
+        '<div class="check-body"><h3>' + c.name + '</h3><p>' + c.detail + '</p>' + tipsHtml + '</div>' +
+        '<div class="check-score">' + c.score + '<small>/' + c.max + '</small></div>';
+      bd.appendChild(row);
+      c.tips.forEach(function(x){ allTips.push(x); });
+    });
+
+    /* top tips */
+    var tl = $("tipsList"); tl.innerHTML = "";
+    var seen = {};
+    allTips.filter(function(x){ if (seen[x]) return false; seen[x] = 1; return true; })
+           .slice(0, 6)
+           .forEach(function(x){
+             var li = document.createElement("li");
+             li.innerHTML = x;
+             tl.appendChild(li);
+           });
+    if (!tl.children.length){
+      tl.innerHTML = "<li><b>Nice work</b> — no major issues found. Keep tailoring keywords to each job posting.</li>";
+    }
+  }
+})();
+</script>
+</body>
+</html>

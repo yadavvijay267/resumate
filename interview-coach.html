@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Interview Coach — ResuMate</title>
+<meta name="description" content="Practice interviews with an AI coach trained on your resume. Get questions, answer them, and receive honest feedback.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --navy:#0F172A; --slate:#475569; --slate-light:#64748B; --faint:#94A3B8;
+    --blue:#2563EB; --violet:#7C3AED;
+    --grad:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);
+    --cream:#FDF3E7; --line:#E9EEF4;
+    --green:#15803D; --green-bg:#F0FDF4;
+    --amber:#B45309; --amber-bg:#FFFBEB;
+    --red:#DC2626; --red-bg:#FEF2F2;
+    --shadow:0 18px 40px rgba(15,23,42,.08);
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--slate);background:#FBFCFE;line-height:1.6;font-size:16px}
+  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;color:var(--navy);line-height:1.15;font-weight:600}
+  a{text-decoration:none}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid transparent;cursor:pointer;transition:transform .18s,box-shadow .18s;font-family:'Inter',sans-serif;background:#fff;color:var(--navy)}
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(99,73,237,.28)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(99,73,237,.34)}
+  .btn-outline{background:#fff;border-color:#CBD5E1;color:var(--navy)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+  .btn-sm{padding:9px 20px;font-size:14px}
+  .btn:disabled{opacity:.55;cursor:wait;transform:none}
+
+  .site-header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid #EEF2F7}
+  .header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:28px}
+  .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .logo-mark{width:38px;height:38px;border-radius:11px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:21px;box-shadow:0 6px 14px rgba(99,73,237,.3)}
+  .logo-text{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+  .logo-text em{font-style:normal;color:var(--blue)}
+  .main-nav{display:flex;align-items:center;gap:26px;margin-left:auto}
+  .main-nav>a{color:var(--navy);font-size:14.5px;font-weight:500;white-space:nowrap}
+  .main-nav a:hover{color:var(--blue)}
+  .main-nav a.active{color:var(--blue);font-weight:700}
+  .header-cta{margin-left:8px}
+
+  .wrap{max-width:820px;margin:0 auto;padding:56px 24px 90px}
+  .hero{text-align:center;max-width:680px;margin:0 auto 36px}
+  .hero h1{font-size:42px;margin-bottom:12px}
+  .hero p{font-size:16.5px;color:var(--slate-light)}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:32px}
+  .hidden{display:none!important}
+
+  /* setup */
+  .field{margin-bottom:18px}
+  .field label{display:block;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px}
+  .field input[type=text],.field select,.field textarea{width:100%;border:1px solid #E2E8F0;border-radius:12px;padding:12px 16px;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--navy);outline:none;background:#FDFEFF}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+  .field textarea{min-height:150px;resize:vertical;line-height:1.7}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:600px){.field-row{grid-template-columns:1fr}}
+  .tab-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .tab-btn{padding:9px 18px;border-radius:999px;border:1px solid #E2E8F0;background:#fff;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;color:var(--slate);cursor:pointer}
+  .tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .key-note{background:#F5F3FF;border:1px solid #DDD6FE;border-radius:12px;padding:12px 16px;font-size:13px;color:#6D28D9;margin-bottom:18px}
+  .key-note a{color:#6D28D9;font-weight:700;text-decoration:underline}
+  .key-note input{width:100%;margin-top:8px;border:1px solid #DDD6FE;border-radius:10px;padding:10px 14px;font-size:13.5px;outline:none}
+
+  /* interview */
+  .progress{height:8px;background:#EEF2F7;border-radius:99px;overflow:hidden;margin-bottom:24px}
+  .progress i{display:block;height:100%;background:var(--grad);border-radius:99px;transition:width .4s}
+  .q-count{font-size:13px;font-weight:700;color:var(--slate-light);margin-bottom:10px;letter-spacing:.04em}
+  .question{font-family:'Fraunces',serif;font-size:23px;color:var(--navy);line-height:1.45;margin-bottom:6px}
+  .q-hint{font-size:13.5px;color:var(--faint);margin-bottom:16px}
+  .answer-box{width:100%;min-height:150px;border:1px solid #E2E8F0;border-radius:14px;padding:16px;font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;color:var(--navy);outline:none;resize:vertical;background:#FDFEFF;margin-bottom:16px}
+  .answer-box:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+  .iv-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .typing{display:inline-flex;gap:5px;align-items:center;padding:14px 0}
+  .typing span{width:8px;height:8px;border-radius:50%;background:var(--faint);animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+
+  /* feedback */
+  .score-ring{display:flex;align-items:center;gap:22px;margin-bottom:24px;flex-wrap:wrap}
+  .score-num{font-family:'Fraunces',serif;font-size:56px;color:var(--navy);line-height:1}
+  .score-num small{font-size:20px;color:var(--faint)}
+  .fb-section{margin-bottom:20px}
+  .fb-section h3{font-size:17px;font-family:'Inter',sans-serif;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .fb-section ul{margin-left:20px;font-size:14.5px;color:var(--slate)}
+  .fb-section li{margin-bottom:6px}
+  .fb-verdict{background:var(--cream);border-radius:14px;padding:16px 20px;font-size:15px;color:var(--navy);font-style:italic}
+  footer{border-top:1px solid var(--line);padding:34px 24px;text-align:center;color:var(--faint);font-size:13.5px}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index"><span class="logo-mark">R</span><span class="logo-text">Resu<em>Mate</em></span></a>
+    <nav class="main-nav">
+      <a href="index">Home</a>
+      <a href="templates">Templates</a>
+      <a href="ats-checker">ATS Checker</a>
+      <a href="interview-coach" class="active">Interview Coach</a>
+      <a href="pricing">Pricing</a>
+      <a href="dashboard">My Resumes</a>
+    </nav>
+    <a href="builder" class="btn btn-primary btn-sm header-cta">Build Resume</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>AI Interview <span class="grad-text">Coach</span></h1>
+    <p>Practice real interview questions generated from <b>your resume</b>. Answer them, and get honest, actionable feedback — free.</p>
+  </div>
+
+  <!-- STEP 1: setup -->
+  <div class="card" id="setupCard">
+    <div class="key-note" id="keyNote" style="display:none">
+      Add your free Gemini API key to enable the coach — it stays in your browser.
+      <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get one here</a>
+      <input type="password" id="apiKeyInput" placeholder="Paste your Gemini API key (AIza…)">
+    </div>
+    <div class="field">
+      <label>Your resume</label>
+      <div class="tab-row">
+        <button type="button" class="tab-btn active" data-src="builder">🧩 From my builder</button>
+        <button type="button" class="tab-btn" data-src="paste">✏️ Paste text</button>
+        <button type="button" class="tab-btn" data-src="sample">📄 Use sample</button>
+      </div>
+      <textarea id="resumeText" placeholder="Your resume text will appear here…"></textarea>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="roleInput">Job role you're preparing for</label>
+        <input type="text" id="roleInput" placeholder="e.g. Software Engineer">
+      </div>
+      <div class="field">
+        <label for="typeSelect">Interview type</label>
+        <select id="typeSelect">
+          <option value="mixed">Mixed (HR + Technical)</option>
+          <option value="HR">HR / Behavioral</option>
+          <option value="technical">Technical</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" style="max-width:220px">
+      <label for="countSelect">Questions</label>
+      <select id="countSelect">
+        <option value="3">3 questions</option>
+        <option value="5" selected>5 questions</option>
+        <option value="8">8 questions</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" id="startBtn" type="button">Start interview →</button>
+  </div>
+
+  <!-- STEP 2: interview -->
+  <div class="card hidden" id="ivCard">
+    <div class="progress"><i id="progBar" style="width:0%"></i></div>
+    <div class="q-count" id="qCount">QUESTION 1 OF 5</div>
+    <div id="qArea">
+      <p class="question" id="qText"></p>
+      <p class="q-hint">Take your time — answer like you would in a real interview.</p>
+    </div>
+    <div id="typingArea" class="hidden"><div class="typing"><span></span><span></span><span></span></div></div>
+    <textarea class="answer-box" id="answerBox" placeholder="Type your answer here…"></textarea>
+    <div class="iv-actions">
+      <button class="btn btn-primary" id="nextBtn" type="button">Submit & next →</button>
+      <button class="btn btn-outline btn-sm" id="skipBtn" type="button">Skip</button>
+      <button class="btn btn-outline btn-sm" id="endBtn" type="button" style="margin-left:auto">End & get feedback</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: feedback -->
+  <div class="card hidden" id="fbCard">
+    <div class="score-ring">
+      <div class="score-num"><span id="fbScore">–</span><small>/100</small></div>
+      <div><h2 style="font-size:24px;margin-bottom:4px">Your interview feedback</h2>
+      <p style="font-size:14px;color:var(--slate-light)" id="fbRole"></p></div>
+    </div>
+    <div id="typingFb"><div class="typing"><span></span><span></span><span></span></div></div>
+    <div id="fbBody" class="hidden">
+      <div class="fb-section"><h3>✅ Strengths</h3><ul id="fbStrengths"></ul></div>
+      <div class="fb-section"><h3>🎯 Improve</h3><ul id="fbImprove"></ul></div>
+      <div class="fb-verdict" id="fbVerdict"></div>
+      <div class="iv-actions" style="margin-top:22px">
+        <button class="btn btn-primary" id="retryBtn" type="button">↻ Practice again</button>
+        <a href="builder" class="btn btn-outline">Back to builder</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 ResuMate — Your Next Career Starts Here.</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY_LS = "resumate_gemini_key", MODEL_LS = "resumate_gemini_model";
+
+  var state = { resume:"", role:"", type:"mixed", total:5, qi:0, history:[] };
+
+  function getKey(){ try { return (localStorage.getItem(KEY_LS)||"").trim(); } catch(e){ return ""; } }
+  function getModel(){ try { return (localStorage.getItem(MODEL_LS)||"").trim() || "gemini-2.0-flash"; } catch(e){ return "gemini-2.0-flash"; } }
+
+  async function gemini(prompt){
+    var key = getKey();
+    if (!key){
+      var typed = ($("apiKeyInput").value||"").trim();
+      if (typed){ try{ localStorage.setItem(KEY_LS, typed); }catch(e){} key = typed; }
+      else throw new Error("key-missing");
+    }
+    var url = "https://generativelanguage.googleapis.com/v1beta/models/" +
+      encodeURIComponent(getModel()) + ":generateContent?key=" + encodeURIComponent(key);
+    var res = await fetch(url, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] }) });
+    if (!res.ok){
+      if (res.status===400) throw new Error("Invalid API key — check it and try again.");
+      if (res.status===403) throw new Error("Key rejected — enable the Generative Language API for it.");
+      if (res.status===429) throw new Error("Rate limit — wait a minute and retry.");
+      throw new Error("AI request failed (" + res.status + ").");
+    }
+    var data = await res.json();
+    var t = data && data.candidates && data.candidates[0] && data.candidates[0].content &&
+      data.candidates[0].content.parts && data.candidates[0].content.parts.map(function(p){return p.text||"";}).join("");
+    if (!t || !t.trim()) throw new Error("Empty AI response — try again.");
+    return t.trim();
+  }
+
+  /* ---------- resume sources ---------- */
+  function resumeToText(r){
+    var L=[], p=r.personal||{};
+    if(p.name)L.push(p.name); if(p.title)L.push(p.title);
+    var c=[p.email,p.phone,p.location,p.linkedin].filter(Boolean).join(" | ");
+    if(c)L.push(c); L.push("");
+    if(p.summary){L.push("SUMMARY");L.push(p.summary);L.push("");}
+    (r.experience||[]).forEach(function(e){ L.push("EXPERIENCE"); L.push([e.role,e.company].filter(Boolean).join(" — ")); if(e.bullets)L.push(e.bullets); L.push(""); });
+    (r.education||[]).forEach(function(e){ L.push("EDUCATION"); L.push([e.degree,e.institution,e.years].filter(Boolean).join(", ")); });
+    if(r.skills){L.push("");L.push("SKILLS");L.push(r.skills);}
+    return L.join("\n");
+  }
+  var SAMPLE = "Aarav Verma\nSoftware Engineer\naarav.verma@example.com | +91 98765 43210 | Bengaluru\n\nSUMMARY\nSoftware engineer with 2+ years building web apps with React and Node.js.\n\nEXPERIENCE\nSoftware Engineer — TechNova Solutions (Jan 2024 - Present)\nBuilt a dashboard used by 20,000+ monthly users\nCut page load time by 35% via code-splitting\n\nEDUCATION\nB.Tech Computer Science, VTU Bengaluru (2020-2024), CGPA 8.7\n\nSKILLS\nJavaScript, React, Node.js, SQL, Git, Docker, AWS";
+
+  function loadBuilderResume(){
+    try{
+      var raw = localStorage.getItem("resumate_demo_resumes");
+      var list = raw ? JSON.parse(raw) : [];
+      if (list.length){ $("resumeText").value = resumeToText(list[0].content || list[0]); return; }
+    }catch(e){}
+    $("resumeText").value = "";
+    $("resumeText").placeholder = "No resume found in the builder yet — build one first, or paste your text.";
+  }
+  document.querySelectorAll(".tab-btn[data-src]").forEach(function(t){
+    t.addEventListener("click", function(){
+      document.querySelectorAll(".tab-btn[data-src]").forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var src = t.getAttribute("data-src");
+      if (src==="builder") loadBuilderResume();
+      else if (src==="sample") $("resumeText").value = SAMPLE;
+      else { $("resumeText").value = ""; $("resumeText").focus(); }
+    });
+  });
+  loadBuilderResume();
+
+  if (!getKey()) $("keyNote").style.display = "block";
+
+  /* ---------- interview flow ---------- */
+  function historyText(){
+    return state.history.map(function(h,i){
+      return "Q"+(i+1)+": "+h.q+"\nA"+(i+1)+": "+(h.a||"(skipped)")+"\n";
+    }).join("\n");
+  }
+  function setTyping(on){
+    $("typingArea").classList.toggle("hidden", !on);
+    $("qArea").classList.toggle("hidden", on);
+    $("nextBtn").disabled = on; $("skipBtn").disabled = on;
+  }
+  function updateProgress(){
+    $("progBar").style.width = Math.round(state.qi/state.total*100) + "%";
+    $("qCount").textContent = "QUESTION " + Math.min(state.qi+1,state.total) + " OF " + state.total;
+  }
+
+  async function askQuestion(){
+    setTyping(true); updateProgress();
+    try{
+      var q = await gemini(
+        "You are a sharp "+state.type+" interviewer hiring for the role \""+state.role+"\".\n"+
+        "Candidate resume:\n"+state.resume.slice(0,4000)+"\n\n"+
+        (state.history.length ? "So far in this interview:\n"+historyText()+"\nAsk a FOLLOW-UP or a new question that builds on their answers. " : "This is the first question. ")+
+        "Rules: ask EXACTLY ONE interview question, no preamble, no numbering, no extra commentary. "+
+        "Make it specific to their resume when possible ("+state.type+" style). Keep it under 40 words.");
+      state.history.push({ q:q, a:"" });
+      $("qText").textContent = q;
+    }catch(e){
+      if (e.message==="key-missing"){ $("keyNote").style.display="block"; $("keyNote").scrollIntoView({behavior:"smooth"}); }
+      else alert(e.message);
+      backToSetup(); return;
+    }
+    setTyping(false);
+    $("answerBox").value = ""; $("answerBox").focus();
+  }
+
+  function backToSetup(){
+    $("ivCard").classList.add("hidden");
+    $("fbCard").classList.add("hidden");
+    $("setupCard").classList.remove("hidden");
+  }
+
+  $("startBtn").addEventListener("click", function(){
+    var resume = $("resumeText").value.trim();
+    var role = $("roleInput").value.trim();
+    if (resume.length < 60){ alert("Please add your resume first (builder, paste, or sample)."); return; }
+    if (!role){ alert("Tell us the job role you're preparing for."); $("roleInput").focus(); return; }
+    if (!getKey() && !$("apiKeyInput").value.trim()){
+      $("keyNote").style.display="block";
+      alert("Add your free Gemini API key first (same one as AI Writer).");
+      return;
+    }
+    state.resume = resume; state.role = role;
+    state.type = $("typeSelect").value;
+    state.total = parseInt($("countSelect").value,10)||5;
+    state.qi = 0; state.history = [];
+    $("setupCard").classList.add("hidden");
+    $("fbCard").classList.add("hidden");
+    $("ivCard").classList.remove("hidden");
+    askQuestion();
+  });
+
+  $("nextBtn").addEventListener("click", function(){
+    var a = $("answerBox").value.trim();
+    if (!a && !confirm("Submit without an answer?")) return;
+    state.history[state.history.length-1].a = a;
+    state.qi++;
+    if (state.qi >= state.total) finish();
+    else askQuestion();
+  });
+  $("skipBtn").addEventListener("click", function(){
+    state.history[state.history.length-1].a = "";
+    state.qi++;
+    if (state.qi >= state.total) finish();
+    else askQuestion();
+  });
+  $("endBtn").addEventListener("click", function(){
+    var a = $("answerBox").value.trim();
+    if (state.history.length) state.history[state.history.length-1].a = a;
+    finish();
+  });
+
+  /* ---------- feedback ---------- */
+  async function finish(){
+    $("ivCard").classList.add("hidden");
+    $("fbCard").classList.remove("hidden");
+    $("fbBody").classList.add("hidden");
+    $("typingFb").classList.remove("hidden");
+    $("fbRole").textContent = "Role: " + state.role + " · " + state.history.length + " questions answered";
+    $("fbCard").scrollIntoView({behavior:"smooth"});
+    try{
+      var fb = await gemini(
+        "You are an honest interview coach. The candidate interviewed for \""+state.role+"\" ("+state.type+" interview).\n\n"+
+        "Transcript:\n"+historyText()+"\n\n"+
+        "Give feedback in EXACTLY this format:\n"+
+        "SCORE: <number 0-100>\n"+
+        "STRENGTHS:\n- <point>\n- <point>\n- <point>\n"+
+        "IMPROVE:\n- <point with a concrete tip>\n- <point with a concrete tip>\n- <point with a concrete tip>\n"+
+        "VERDICT: <one encouraging line>\n\n"+
+        "Be specific to their answers, not generic. No extra sections.");
+      renderFeedback(fb);
+    }catch(e){ alert(e.message); backToSetup(); }
+  }
+
+  function renderFeedback(fb){
+    $("typingFb").classList.add("hidden");
+    $("fbBody").classList.remove("hidden");
+    var score = (fb.match(/SCORE:\s*(\d+)/)||[])[1] || "–";
+    $("fbScore").textContent = score;
+    function section(name){
+      var m = fb.match(new RegExp(name+":\\s*([\\s\\S]*?)(?=\\n[A-Z]+:|$)"));
+      if (!m) return [];
+      return m[1].split("\n").map(function(l){return l.replace(/^[-•\s]+/,"").trim();}).filter(Boolean);
+    }
+    $("fbStrengths").innerHTML = section("STRENGTHS").map(function(x){return "<li>"+x+"</li>";}).join("") || "<li>—</li>";
+    $("fbImprove").innerHTML = section("IMPROVE").map(function(x){return "<li>"+x+"</li>";}).join("") || "<li>—</li>";
+    var v = (fb.match(/VERDICT:\s*(.+)/)||[])[1];
+    $("fbVerdict").textContent = v ? "\u201C"+v.trim()+"\u201D" : "";
+  }
+
+  $("retryBtn").addEventListener("click", backToSetup);
+})();
+</script>
+</body>
+</html>
