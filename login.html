@@ -93,6 +93,7 @@
 
         <button type="submit" class="btn-submit">Sign in</button>
         <p class="form-status info" id="formStatus" role="status" aria-live="polite"></p>
+        <p id="demoFallback" style="display:none;margin-top:10px;font-size:14px;text-align:center">Having trouble? <a href="builder" style="color:var(--blue);font-weight:600">Continue without an account →</a><br><span style="color:var(--slate-light);font-size:13px">Your resumes stay in this browser until you sign in.</span></p>
 
         <p class="switch-line">Don't have an account? <a href="signup">Sign up</a></p>
       </form>
@@ -121,6 +122,24 @@
     statusEl.textContent = msg || "";
     statusEl.className = "form-status " + (type || "info");
   }
+  /* Translate raw auth errors into something a person can act on.
+     "Failed to fetch" means the browser could not reach Supabase at
+     all — most often a paused free-tier project. Offer demo mode
+     so the visitor is never stuck. */
+  function friendlyError(err) {
+    var m = (err && err.message) || "";
+    if (/failed to fetch|network|load failed|networkerror/i.test(m)) {
+      return "Couldn't reach the server — the database may be paused. You can continue without an account for now and sign in later.";
+    }
+    if (/provider.*not enabled|unsupported provider|provider not found/i.test(m)) {
+      return "Google sign-in isn't switched on for this site yet. Use email sign-in below, or continue without an account.";
+    }
+    return m || "Something went wrong. Please try again.";
+  }
+  function showDemoFallback(show) {
+    var f = document.getElementById("demoFallback");
+    if (f) f.style.display = show ? "block" : "none";
+  }
   function builderUrl() {
     return new URL("builder", window.location.href).href;
   }
@@ -146,15 +165,18 @@
     var password = document.getElementById("liPassword").value;
 
     setStatus("Signing you in…", "info");
+    showDemoFallback(false);
     try {
       var res = await RM.client.auth.signInWithPassword({ email: email, password: password });
       if (res.error) {
-        setStatus(res.error.message, "error");
+        setStatus(friendlyError(res.error), "error");
+        if (/failed to fetch|network|load failed/i.test(res.error.message || "")) showDemoFallback(true);
         return;
       }
       window.location.href = "builder";
     } catch (err) {
-      setStatus("Something went wrong. Please check your connection and try again.", "error");
+      setStatus(friendlyError(err), "error");
+      showDemoFallback(true);
     }
   });
 
@@ -168,9 +190,13 @@
         provider: "google",
         options: { redirectTo: builderUrl() }
       });
-      if (res.error) setStatus(res.error.message, "error");
+      if (res.error) {
+        setStatus(friendlyError(res.error), "error");
+        if (/failed to fetch|network|load failed/i.test(res.error.message || "")) showDemoFallback(true);
+      }
     } catch (err) {
-      setStatus("Something went wrong. Please try again.", "error");
+      setStatus(friendlyError(err), "error");
+      showDemoFallback(true);
     }
   });
 })();

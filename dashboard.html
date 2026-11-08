@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Resumes — ResuMate</title>
-<meta name="description" content="Continue editing your resumes, import an existing one, or check your ATS score.">
+<title>Dashboard — ResuMate</title>
+<meta name="description" content="Your resumes, templates and ATS tools in one place.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -46,8 +46,6 @@
   #userBadge{display:none;font-size:13.5px;font-weight:600;color:var(--slate);margin-left:8px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
   .wrap{max-width:1100px;margin:0 auto;padding:52px 24px 90px}
-  .dash-top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:30px}
-  .dash-top h1{font-size:36px;margin-right:auto}
   .demo-banner{display:none;background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;border-radius:14px;padding:12px 18px;font-size:14px;font-weight:500;margin-bottom:22px}
   .demo-banner a{color:#92400E;font-weight:700;text-decoration:underline}
 
@@ -79,10 +77,82 @@
   .modal textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
   .modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
   footer{border-top:1px solid var(--line);padding:34px 24px;text-align:center;color:var(--faint);font-size:13.5px}
+
+  /* ---------- sidebar (desktop) ---------- */
+  .sidebar{display:none}
+  @media(min-width:1024px){
+    .sidebar{display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;width:240px;background:#FCFAF5;border-right:1px solid var(--line);z-index:70;padding:22px 16px;overflow-y:auto}
+    .main{margin-left:240px}
+    .site-header{margin-left:240px}
+    .site-header .logo,.site-header .main-nav{display:none}
+    .site-header .header-inner{max-width:none;justify-content:flex-end}
+  }
+  .side-logo{display:flex;align-items:center;gap:10px;padding:4px 10px 18px}
+  .side-label{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:18px 12px 8px}
+  .side-nav{display:flex;flex-direction:column;gap:2px}
+  .side-link{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;color:var(--navy);font-size:14.5px;font-weight:500}
+  .side-link:hover{background:#F1F5F9}
+  .side-link.active{background:#DBEAFE;color:var(--blue);font-weight:700}
+  .side-ic{width:18px;height:18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--slate-light)}
+  .side-link.active .side-ic{color:var(--blue)}
+
+  /* ---------- welcome card ---------- */
+  .welcome-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:38px 36px;box-shadow:var(--shadow);margin-bottom:22px}
+  .welcome-card .eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+  .welcome-card h1{font-size:42px;letter-spacing:-.01em}
+  .welcome-card p{margin-top:12px;font-size:16.5px;max-width:640px}
+  @media(max-width:700px){.welcome-card{padding:28px 24px}.welcome-card h1{font-size:32px}}
+
+  /* ---------- action cards ---------- */
+  .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:22px}
+  @media(max-width:900px){.actions{grid-template-columns:1fr}}
+  .action-card{border-radius:22px;padding:28px;box-shadow:0 10px 26px rgba(15,23,42,.05);display:flex;flex-direction:column;gap:6px}
+  .action-blue{background:#EFF6FF}
+  .action-green{background:#ECFDF5}
+  .action-orange{background:#FFF7ED}
+  .action-ic{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:12px}
+  .action-blue .action-ic{background:var(--blue)}
+  .action-green .action-ic{background:#059669}
+  .action-orange .action-ic{background:#D97706}
+  .action-card h3{font-size:24px}
+  .action-card p{font-size:14.5px;color:var(--slate);flex:1}
+  .action-link{font-weight:600;font-size:14.5px;background:none;border:0;cursor:pointer;padding:0;text-align:left;font-family:'Inter',sans-serif;margin-top:10px}
+  .action-blue .action-link{color:var(--blue)}
+  .action-green .action-link{color:#047857}
+  .action-orange .action-link{color:#B45309}
+  .action-link:hover{text-decoration:underline}
+
+  /* ---------- continue editing ---------- */
+  .continue-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:34px 0 18px}
+  .continue-head h2{font-size:28px}
+  .view-all{font-size:14.5px;font-weight:600;color:var(--navy);white-space:nowrap}
+  .view-all:hover{color:var(--blue)}
 </style>
 </head>
 <body>
 
+<!-- ============ SIDEBAR (desktop) ============ -->
+<aside class="sidebar">
+  <a class="side-logo" href="index"><span class="logo-mark">R</span><span class="logo-text">Resu<em>Mate</em></span></a>
+  <div class="side-label">Workspace</div>
+  <nav class="side-nav">
+    <a href="dashboard" class="side-link active"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</a>
+    <a href="dashboard#continue" class="side-link"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></span>Resumes</a>
+    <a href="templates" class="side-link"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></span>Templates</a>
+    <a href="#" class="side-link" id="sideImport"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>Import</a>
+    <a href="pricing" class="side-link"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings</a>
+  </nav>
+  <div class="side-label">AI Tools</div>
+  <nav class="side-nav">
+    <a href="ats-checker" class="side-link"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>ATS Checker</a>
+    <a href="interview-coach" class="side-link"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>AI Resume Interviewer</a>
+    <a href="optimizer" class="side-link"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg></span>AI Optimizer</a>
+    <a href="job-scan" class="side-link"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/></svg></span>AI Job Scan</a>
+    <a href="negotiation-coach" class="side-link"><span class="side-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>AI Negotiation Coach</a>
+  </nav>
+</aside>
+
+<!-- ============ TOP HEADER (mobile nav + auth) ============ -->
 <header class="site-header">
   <div class="header-inner">
     <a class="logo" href="index"><span class="logo-mark">R</span><span class="logo-text">Resu<em>Mate</em></span></a>
@@ -99,25 +169,59 @@
   </div>
 </header>
 
-<div class="wrap">
-  <div class="dash-top">
-    <h1>My <span class="grad-text">Resumes</span></h1>
-    <button class="btn btn-outline btn-sm" id="importBtn" type="button">📥 Import resume</button>
-    <a href="builder" class="btn btn-primary btn-sm">＋ New resume</a>
+<!-- ============ MAIN ============ -->
+<div class="main">
+  <div class="wrap">
+
+    <section class="welcome-card">
+      <div class="eyebrow">ResuMate</div>
+      <h1>Your resumes are ready when you are</h1>
+      <p>Pick up where you left off, or start something new — a template, a quick import, or an ATS check is one click away.</p>
+    </section>
+
+    <div class="demo-banner" id="demoBanner">
+      You're browsing in <b>demo mode</b> — resumes are saved only in this browser.
+      <a href="signup">Create a free account</a> to sync them everywhere.
+    </div>
+
+    <section class="actions">
+      <div class="action-card action-blue">
+        <div class="action-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>
+        <h3 class="serif">Create New Resume</h3>
+        <p>Pick a template and build from scratch — most people finish in under ten minutes.</p>
+        <a class="action-link" href="templates">Choose a template &rarr;</a>
+      </div>
+      <div class="action-card action-green">
+        <div class="action-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></div>
+        <h3 class="serif">Import Resume</h3>
+        <p>Paste the text of a resume you already have and we'll pull out the details for you.</p>
+        <button class="action-link" id="importBtn" type="button">Import resume &rarr;</button>
+      </div>
+      <div class="action-card action-orange">
+        <div class="action-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3 class="serif">ATS Checker</h3>
+        <p>See how applicant-tracking systems read your resume before a recruiter ever does.</p>
+        <a class="action-link" href="ats-checker">Run the check &rarr;</a>
+      </div>
+    </section>
+
+    <div class="stats">
+      <div class="stat"><b id="statTotal">0</b><span>Total resumes</span></div>
+      <div class="stat"><b>8</b><span>Templates available</span></div>
+      <div class="stat link-card" id="atsCard"><b style="color:var(--blue)">&rarr;</b><span>Check your ATS score — free</span></div>
+    </div>
+
+    <section id="continue">
+      <div class="continue-head">
+        <h2 class="serif">Continue Editing</h2>
+        <a href="#continue" class="view-all">View All &rarr;</a>
+      </div>
+      <div id="listArea"><div class="loading">Loading your resumes…</div></div>
+    </section>
+
   </div>
 
-  <div class="demo-banner" id="demoBanner">
-    You're browsing in <b>demo mode</b> — resumes are saved only in this browser.
-    <a href="signup">Create a free account</a> to sync them everywhere.
-  </div>
-
-  <div class="stats">
-    <div class="stat"><b id="statTotal">0</b><span>Total resumes</span></div>
-    <div class="stat"><b>8</b><span>Templates available</span></div>
-    <div class="stat link-card" id="atsCard"><b style="color:var(--blue)">→</b><span>Check your ATS score — free</span></div>
-  </div>
-
-  <div id="listArea"><div class="loading">Loading your resumes…</div></div>
+  <footer>© 2026 ResuMate — Your Next Career Starts Here.</footer>
 </div>
 
 <div class="modal-back" id="importModal">
@@ -131,8 +235,6 @@
     </div>
   </div>
 </div>
-
-<footer>© 2026 ResuMate — Your Next Career Starts Here.</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -316,6 +418,8 @@
 
   /* ---------- import ---------- */
   $("importBtn").addEventListener("click", function(){ $("importModal").classList.add("open"); });
+  var sideImportLink = $("sideImport");
+  if (sideImportLink) sideImportLink.addEventListener("click", function(e){ e.preventDefault(); $("importModal").classList.add("open"); });
   $("importCancel").addEventListener("click", function(){ $("importModal").classList.remove("open"); });
   $("importModal").addEventListener("click", function(e){ if (e.target === $("importModal")) $("importModal").classList.remove("open"); });
   $("atsCard").addEventListener("click", function(){ location.href = "ats-checker"; });

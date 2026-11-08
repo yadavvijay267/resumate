@@ -320,6 +320,7 @@
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="auth.js"></script>
+<script src="samples.js"></script>
 <script>
 (function () {
   "use strict";
@@ -367,6 +368,7 @@
   var state = emptyState();
   var mode = "demo"; /* 'demo' | 'supabase' */
   var currentUser = null;
+  var chosenSample = null; /* sample chosen from templates page via localStorage "resumate_sample" */
 
   /* ---------------- helpers ---------------- */
   function el(id) { return document.getElementById(id); }
@@ -716,12 +718,102 @@
   }
 
   function applySample() {
-    state.title = SAMPLE.title;
-    state.personal = JSON.parse(JSON.stringify(SAMPLE.personal));
-    state.skills = SAMPLE.skills;
-    state.experience = JSON.parse(JSON.stringify(SAMPLE.experience));
-    state.education = JSON.parse(JSON.stringify(SAMPLE.education));
-    state.projects = JSON.parse(JSON.stringify(SAMPLE.projects));
+    var src = chosenSample || SAMPLE;
+    state.title = src.title;
+    state.personal = JSON.parse(JSON.stringify(src.personal));
+    state.skills = src.skills;
+    state.experience = JSON.parse(JSON.stringify(src.experience));
+    state.education = JSON.parse(JSON.stringify(src.education));
+    state.projects = JSON.parse(JSON.stringify(src.projects));
+    if (src.template && TEMPLATE_IDS.indexOf(src.template) >= 0) state.template = src.template;
+  }
+
+  /* Heuristic resume-text parser (same shape as dashboard's import).
+     Used to load text sent by the AI Optimizer via localStorage
+     "resumate_optimizer_input" into the builder's structured state. */
+  function parseResumeText(text) {
+    var lines = text.split("\n").map(function (l) { return l.trim(); });
+    var personal = { name: "", title: "", email: "", phone: "", location: "", linkedin: "", github: "", summary: "" };
+    var em = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+    if (em) personal.email = em[0];
+    var ph = text.match(/\+?\d[\d\s().-]{8,}\d/);
+    if (ph) personal.phone = ph[0].trim();
+    var li = text.match(/(linkedin\.com\/[^\s|]+)/i);
+    if (li) personal.linkedin = li[0];
+    var gh = text.match(/(github\.com\/[^\s|]+)/i);
+    if (gh) personal.github = gh[0];
+    for (var i = 0; i < Math.min(4, lines.length); i++) {
+      var l = lines[i];
+      if (l && !/@/.test(l) && !/\+?\d{7,}/.test(l) && l.length < 60 && !/^(resume|cv|curriculum)/i.test(l)) {
+        if (!personal.name) personal.name = l;
+        else if (!personal.title && l.length < 60) { personal.title = l; break; }
+      }
+    }
+    function sectionBody(names) {
+      var idx = -1;
+      for (var i = 0; i < lines.length; i++) {
+        var l = lines[i].toLowerCase().replace(/[^a-z ]/g, "").trim();
+        for (var n = 0; n < names.length; n++) {
+          if (l === names[n] || l === names[n] + "s") { idx = i; break; }
+        }
+        if (idx !== -1) break;
+      }
+      if (idx === -1) return "";
+      var out = [], j = idx + 1;
+      var allHeads = ["summary", "objective", "profile", "experience", "employment", "work history", "education", "academic", "qualification", "skills", "technical skills", "projects", "certifications", "languages", "interests"];
+      while (j < lines.length) {
+        var lj = lines[j].toLowerCase().replace(/[^a-z ]/g, "").trim();
+        if (allHeads.indexOf(lj) !== -1) break;
+        out.push(lines[j]); j++;
+      }
+      return out.join("\n").trim();
+    }
+    personal.summary = sectionBody(["summary", "objective", "profile"]).split("\n").filter(Boolean).join(" ");
+    var skillsRaw = sectionBody(["skills", "technical skills"]);
+    var skills = skillsRaw.split("\n").map(function (s) { return s.replace(/^[•\-*]\s*/, "").trim(); }).filter(Boolean).join(", ");
+    var expRaw = sectionBody(["experience", "employment", "work history"]);
+    var experience = [];
+    if (expRaw) {
+      var chunks = expRaw.split(/\n\s*\n/).filter(function (c) { return c.trim().length > 8; });
+      chunks.slice(0, 8).forEach(function (c) {
+        var cl = c.split("\n").map(function (x) { return x.trim(); }).filter(Boolean);
+        if (!cl.length) return;
+        var head = cl[0].replace(/^[•\-*]\s*/, "");
+        var role = head, company = "", dates = "";
+        var dm = head.match(/^(.*?)\s*[—–|@-]\s*(.*?)\s*(\(?\d{4}.*)?$/);
+        if (dm) { role = (dm[1] || "").trim(); company = (dm[2] || "").trim(); dates = (dm[3] || "").replace(/[()]/g, "").trim(); }
+        var bullets = cl.slice(1).map(function (x) { return x.replace(/^[•\-*]\s*/, ""); }).join("\n");
+        experience.push({ role: role.slice(0, 80), company: company.slice(0, 80), start: dates, end: "", bullets: bullets.slice(0, 1200) });
+      });
+    }
+    var eduRaw = sectionBody(["education", "academic", "qualification"]);
+    var education = [];
+    if (eduRaw) {
+      eduRaw.split("\n").filter(Boolean).slice(0, 4).forEach(function (l) {
+        education.push({ degree: l.replace(/^[•\-*]\s*/, "").slice(0, 120), institution: "", location: "", years: "", score: "" });
+      });
+    }
+    var projRaw = sectionBody(["projects"]);
+    var projects = [];
+    if (projRaw) {
+      projRaw.split(/\n\s*\n/).filter(function (c) { return c.trim().length > 8; }).slice(0, 4).forEach(function (c) {
+        var cl = c.split("\n").map(function (x) { return x.trim(); }).filter(Boolean);
+        if (!cl.length) return;
+        projects.push({ name: cl[0].replace(/^[•\-*]\s*/, "").slice(0, 80), tech: "", desc: cl.slice(1).join(" ").slice(0, 300) });
+      });
+    }
+    return { personal: personal, skills: skills, experience: experience, education: education, projects: projects };
+  }
+
+  /* Load text sent by the AI Optimizer into the builder state. */
+  function applyOptimizedText(text) {
+    var parsed = parseResumeText(text);
+    state.title = parsed.personal.name ? parsed.personal.name.split(" ")[0] + "'s Resume" : "Optimized Resume";
+    state.personal = parsed.personal;
+    state.skills = parsed.skills;
+    state.experience = parsed.experience;
+    state.education = parsed.education;
+    state.projects = parsed.projects;
   }
 
   /* ---------------- events ---------------- */
@@ -938,6 +1030,20 @@
     try { pre = localStorage.getItem("resumate_selected_template"); } catch (e) { /* ignore */ }
     if (pre && TEMPLATE_IDS.indexOf(pre) >= 0) state.template = pre;
 
+    /* Sample chosen from templates page: localStorage "resumate_sample".
+       Read once and clear so it doesn't stick to later visits. */
+    var sampleKey = null;
+    try { sampleKey = localStorage.getItem("resumate_sample"); localStorage.removeItem("resumate_sample"); } catch (e) { /* ignore */ }
+    if (sampleKey && window.RESUMATE_SAMPLES && window.RESUMATE_SAMPLES[sampleKey]) {
+      chosenSample = window.RESUMATE_SAMPLES[sampleKey];
+    }
+
+    /* Text sent by the AI Optimizer ("Apply to builder").
+       Read once and clear. Takes priority over a chosen sample,
+       but never over an explicit ?id= deep link to a saved resume. */
+    var optimizedText = null;
+    try { optimizedText = localStorage.getItem("resumate_optimizer_input"); localStorage.removeItem("resumate_optimizer_input"); } catch (e) { /* ignore */ }
+
     /* Deep link from dashboard: builder.html?id=<resume-id> */
     var openId = null;
     try { openId = new URLSearchParams(window.location.search).get("id"); } catch (e) {}
@@ -956,6 +1062,10 @@
       el("demoBanner").style.display = "none";
       if (openId) {
         await loadResume(openId);
+      } else if (optimizedText) {
+        applyOptimizedText(optimizedText);
+      } else if (chosenSample) {
+        applySample();
       } else {
         var res = null;
         try {
@@ -969,6 +1079,10 @@
       el("demoBanner").style.display = "block";
       if (openId) {
         await loadResume(openId);
+      } else if (optimizedText) {
+        applyOptimizedText(optimizedText);
+      } else if (chosenSample) {
+        applySample();
       } else if (!demoLoad().length) {
         applySample();
       }

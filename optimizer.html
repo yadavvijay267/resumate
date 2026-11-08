@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Optimizer — ResuMate</title>
+<meta name="description" content="Rewrite weak resume lines with sharp, ATS-friendly language. See before and after, copy the rewrites, and apply them to your builder resume.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --navy:#0F172A; --slate:#475569; --slate-light:#64748B; --faint:#94A3B8;
+    --blue:#2563EB; --violet:#7C3AED;
+    --grad:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);
+    --cream:#FDF3E7; --line:#E9EEF4;
+    --green:#15803D; --green-bg:#F0FDF4;
+    --amber:#B45309; --amber-bg:#FFFBEB;
+    --red:#DC2626; --red-bg:#FEF2F2;
+    --shadow:0 18px 40px rgba(15,23,42,.08);
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--slate);background:#FBFCFE;line-height:1.6;font-size:16px}
+  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;color:var(--navy);line-height:1.15;font-weight:600}
+  a{text-decoration:none}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid transparent;cursor:pointer;transition:transform .18s,box-shadow .18s;font-family:'Inter',sans-serif;background:#fff;color:var(--navy)}
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(99,73,237,.28)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(99,73,237,.34)}
+  .btn-outline{background:#fff;border-color:#CBD5E1;color:var(--navy)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+  .btn-sm{padding:9px 20px;font-size:14px}
+  .btn:disabled{opacity:.55;cursor:wait;transform:none}
+
+  .site-header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid #EEF2F7}
+  .header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:28px}
+  .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .logo-mark{width:38px;height:38px;border-radius:11px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:21px;box-shadow:0 6px 14px rgba(99,73,237,.3)}
+  .logo-text{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+  .logo-text em{font-style:normal;color:var(--blue)}
+  .main-nav{display:flex;align-items:center;gap:26px;margin-left:auto}
+  .main-nav>a{color:var(--navy);font-size:14.5px;font-weight:500;white-space:nowrap}
+  .main-nav a:hover{color:var(--blue)}
+  .main-nav a.active{color:var(--blue);font-weight:700}
+  .header-cta{margin-left:8px}
+
+  .wrap{max-width:900px;margin:0 auto;padding:56px 24px 90px}
+  .hero{text-align:center;max-width:720px;margin:0 auto 40px}
+  .hero h1{font-size:44px;margin-bottom:14px}
+  .hero p{font-size:17px;color:var(--slate-light)}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:30px}
+  .hidden{display:none!important}
+  .key-note{background:#F5F3FF;border:1px solid #DDD6FE;border-radius:12px;padding:12px 16px;font-size:13px;color:#6D28D9;margin-bottom:18px}
+  .key-note a{color:#6D28D9;font-weight:700;text-decoration:underline}
+  .key-note input{width:100%;margin-top:8px;border:1px solid #DDD6FE;border-radius:10px;padding:10px 14px;font-size:13.5px;outline:none}
+
+  .field label{display:block;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px}
+  .field textarea{width:100%;min-height:300px;border:1px solid #E2E8F0;border-radius:16px;padding:18px;font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.7;color:var(--navy);outline:none;resize:vertical;background:#FDFEFF}
+  .field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+  .field .hint{font-size:12.5px;color:var(--faint);margin-top:6px}
+  .opt-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px}
+
+  .typing{display:inline-flex;gap:5px;align-items:center;padding:20px 0}
+  .typing span{width:8px;height:8px;border-radius:50%;background:var(--faint);animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+
+  #results{display:none;margin-top:28px}
+  .results-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .results-head h2{font-size:24px}
+  .results-head .btn-row{display:flex;gap:10px;flex-wrap:wrap}
+  .rw-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px 26px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .rw-num{font-size:12px;font-weight:700;color:var(--faint);letter-spacing:.08em;margin-bottom:12px}
+  .rw-line{font-size:15px;line-height:1.65;border-radius:12px;padding:12px 16px;margin-bottom:10px}
+  .rw-old{background:#F8FAFC;color:var(--slate-light);text-decoration:line-through}
+  .rw-old b{display:block;font-size:11.5px;letter-spacing:.08em;color:var(--faint);text-decoration:none;margin-bottom:4px}
+  .rw-new{background:var(--green-bg);color:var(--navy)}
+  .rw-new b{display:block;font-size:11.5px;letter-spacing:.08em;color:var(--green);margin-bottom:4px}
+  .rw-why{font-size:13.5px;color:var(--slate-light)}
+  .rw-why b{color:var(--navy)}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  footer{border-top:1px solid var(--line);padding:34px 24px;text-align:center;color:var(--faint);font-size:13.5px}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="index"><span class="logo-mark">R</span><span class="logo-text">Resu<em>Mate</em></span></a>
+    <nav class="main-nav">
+      <a href="index">Home</a>
+      <a href="templates">Templates</a>
+      <a href="ats-checker">ATS Checker</a>
+      <a href="interview-coach">Interview Coach</a>
+      <a href="pricing">Pricing</a>
+      <a href="dashboard">My Resumes</a>
+    </nav>
+    <a href="builder" class="btn btn-primary btn-sm header-cta">Build Resume</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>AI <span class="grad-text">Optimizer</span></h1>
+    <p>Paste your resume and we'll find its five weakest lines — then rewrite each one with strong, ATS-friendly language you can use right away.</p>
+  </div>
+
+  <div class="card">
+    <div class="key-note" id="keyNote" style="display:none">
+      Add your free Gemini API key to run the optimizer — it stays in your browser, never on our servers.
+      <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get one here</a>
+      <input type="password" id="apiKeyInput" placeholder="Paste your Gemini API key (AIza…)">
+    </div>
+    <div class="field">
+      <label for="resumeText">Your resume</label>
+      <textarea id="resumeText" placeholder="Paste your full resume text here — summary, experience bullets, everything…"></textarea>
+      <div class="hint">The optimizer looks at your summary and experience bullets — the lines recruiters actually read.</div>
+    </div>
+    <div class="opt-actions">
+      <button class="btn btn-primary" id="optBtn" type="button">Optimize my resume →</button>
+      <button class="btn btn-outline btn-sm" id="loadBtn" type="button">Load my resume</button>
+      <button class="btn btn-outline btn-sm" id="sampleBtn" type="button">Try a sample</button>
+    </div>
+  </div>
+
+  <div id="loading" class="hidden" style="text-align:center"><div class="typing"><span></span><span></span><span></span></div><p style="color:var(--slate-light);font-size:14px">Reading every line and finding the weak spots…</p></div>
+
+  <div id="results">
+    <div class="results-head">
+      <h2>Your 5 strongest rewrites</h2>
+      <div class="btn-row">
+        <button class="btn btn-outline btn-sm" id="copyBtn" type="button">📋 Copy all rewrites</button>
+        <button class="btn btn-primary btn-sm" id="applyBtn" type="button">Apply to builder →</button>
+      </div>
+    </div>
+    <div id="rwList"></div>
+    <div class="cta-row">
+      <a href="ats-checker" class="btn btn-outline">Check the new ATS score</a>
+      <a href="builder" class="btn btn-outline">Back to builder</a>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 ResuMate — Your Next Career Starts Here.</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY_LS = "resumate_gemini_key", MODEL_LS = "resumate_gemini_model";
+  var rewrites = [];   /* [{original, rewritten, why}] */
+  var originalText = "";
+
+  function getKey(){ try { return (localStorage.getItem(KEY_LS)||"").trim(); } catch(e){ return ""; } }
+  function getModel(){ try { return (localStorage.getItem(MODEL_LS)||"").trim() || "gemini-2.0-flash"; } catch(e){ return "gemini-2.0-flash"; } }
+
+  async function gemini(prompt){
+    var key = getKey();
+    if (!key){
+      var typed = ($("apiKeyInput").value||"").trim();
+      if (typed){ try{ localStorage.setItem(KEY_LS, typed); }catch(e){} key = typed; }
+      else throw new Error("key-missing");
+    }
+    var url = "https://generativelanguage.googleapis.com/v1beta/models/" +
+      encodeURIComponent(getModel()) + ":generateContent?key=" + encodeURIComponent(key);
+    var res = await fetch(url, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] }) });
+    if (!res.ok){
+      if (res.status===400) throw new Error("Invalid API key — check it and try again.");
+      if (res.status===403) throw new Error("Key rejected — enable the Generative Language API for it.");
+      if (res.status===429) throw new Error("Rate limit — wait a minute and retry.");
+      throw new Error("AI request failed (" + res.status + ").");
+    }
+    var data = await res.json();
+    var t = data && data.candidates && data.candidates[0] && data.candidates[0].content &&
+      data.candidates[0].content.parts && data.candidates[0].content.parts.map(function(p){return p.text||"";}).join("");
+    if (!t || !t.trim()) throw new Error("Empty AI response — try again.");
+    return t.trim();
+  }
+
+  if (!getKey()) $("keyNote").style.display = "block";
+
+  /* ---------- resume sources ---------- */
+  function resumeToText(r){
+    var L = [], p = r.personal || {};
+    if (p.name) L.push(p.name);
+    if (p.title) L.push(p.title);
+    var c = [p.email, p.phone, p.location, p.linkedin, p.github].filter(Boolean).join(" | ");
+    if (c) L.push(c);
+    L.push("");
+    if (p.summary){ L.push("SUMMARY"); L.push(p.summary); L.push(""); }
+    (r.experience||[]).forEach(function(e){
+      L.push("EXPERIENCE");
+      L.push([e.role, e.company].filter(Boolean).join(" — ") + " (" + [e.start, e.end].filter(Boolean).join(" - ") + ")");
+      if (e.bullets) L.push(e.bullets);
+      L.push("");
+    });
+    (r.education||[]).forEach(function(e){
+      L.push("EDUCATION");
+      L.push([e.degree, e.institution, e.years].filter(Boolean).join(", "));
+    });
+    if (r.skills){ L.push(""); L.push("SKILLS"); L.push(r.skills); }
+    if (r.projects && r.projects.length){
+      L.push(""); L.push("PROJECTS");
+      r.projects.forEach(function(pr){
+        L.push((pr.name||"") + (pr.tech ? " (" + pr.tech + ")" : ""));
+        if (pr.desc) L.push(pr.desc);
+      });
+    }
+    return L.join("\n");
+  }
+
+  var SAMPLE_RESUME = "Aarav Verma\nSoftware Engineer\naarav.verma@example.com | +91 98765 43210 | Bengaluru, India | linkedin.com/in/aaravverma | github.com/aaravverma\n\nSUMMARY\nSoftware engineer with 2+ years of experience building web applications with React and Node.js. Focused on clean, reliable code and fast, accessible user experiences.\n\nEXPERIENCE\nSoftware Engineer — TechNova Solutions (Jan 2024 - Present)\nResponsible for the customer dashboard and handling user requests\nWorked on the frontend using React and helped with bug fixes\nWas part of a team that improved the app\n\nEDUCATION\nB.Tech in Computer Science, Visvesvaraya Technological University, Bengaluru (2020 – 2024), CGPA: 8.7\n\nSKILLS\nJavaScript, React, Node.js, SQL, Git, Docker, AWS, CI/CD, Agile, REST API";
+
+  $("loadBtn").addEventListener("click", function(){
+    try{
+      var raw = localStorage.getItem("resumate_demo_resumes");
+      var list = raw ? JSON.parse(raw) : [];
+      if (list.length){
+        var r = list[0];
+        $("resumeText").value = resumeToText(r.content || r);
+        return;
+      }
+    }catch(e){}
+    $("resumeText").value = SAMPLE_RESUME;
+    $("resumeText").placeholder = "No resume found in the builder yet — loaded the sample instead.";
+  });
+
+  $("sampleBtn").addEventListener("click", function(){
+    $("resumeText").value = SAMPLE_RESUME;
+    $("resumeText").focus();
+  });
+
+  /* ---------- optimize ---------- */
+  function esc(s){
+    return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+
+  $("optBtn").addEventListener("click", async function(){
+    var text = $("resumeText").value.trim();
+    if (text.length < 120){ alert("Please paste your resume text first (a few sections at least)."); $("resumeText").focus(); return; }
+    if (!getKey() && !$("apiKeyInput").value.trim()){
+      $("keyNote").style.display = "block";
+      alert("Add your free Gemini API key first (same one as AI Writer).");
+      return;
+    }
+    originalText = text;
+    $("optBtn").disabled = true;
+    $("results").style.display = "none";
+    $("loading").classList.remove("hidden");
+    try{
+      var out = await gemini(
+        "You are a resume editor. Find the 5 weakest lines in this resume — vague duties, passive wording, or lines with no result — and rewrite each one. Never invent numbers, tools or achievements that are not in the resume; if a line has no measurable result, strengthen the wording without adding fake metrics.\n\n" +
+        "RESUME:\n" + text.slice(0, 5000) + "\n\n" +
+        "Reply with EXACTLY 5 items in this format and nothing else:\n" +
+        "1. ORIGINAL: <the weak line, copied exactly as written>\n" +
+        "   REWRITTEN: <the improved line, under 25 words, starting with a strong action verb>\n" +
+        "   WHY: <one line explaining why the rewrite is stronger>\n" +
+        "2. ORIGINAL: ...\n" +
+        "   REWRITTEN: ...\n" +
+        "   WHY: ...\n" +
+        "(same pattern for 3, 4 and 5)\n\n" +
+        "Pick lines from the summary and experience bullets first. Keep rewrites honest to the original meaning.");
+      rewrites = parseRewrites(out);
+      if (!rewrites.length) throw new Error("Could not read the AI response — try again.");
+      renderResults();
+    }catch(e){
+      if (e.message === "key-missing"){ $("keyNote").style.display = "block"; $("keyNote").scrollIntoView({behavior:"smooth"}); }
+      else alert(e.message);
+    }
+    $("loading").classList.add("hidden");
+    $("optBtn").disabled = false;
+  });
+
+  function parseRewrites(out){
+    var items = [];
+    var blocks = ("\n" + out).split(/\n\s*\d+\.\s+ORIGINAL:/);
+    for (var i = 1; i < blocks.length; i++){
+      var b = blocks[i];
+      var o = b.match(/^(.*?)\n\s*REWRITTEN:/s);
+      var r = b.match(/REWRITTEN:\s*(.*?)\n\s*WHY:/s);
+      var w = b.match(/WHY:\s*([^\n]+)/);
+      if (o && r){
+        items.push({
+          original: o[1].replace(/^\s+|\s+$/g, ""),
+          rewritten: r[1].replace(/^\s+|\s+$/g, ""),
+          why: w ? w[1].replace(/^\s+|\s+$/g, "") : ""
+        });
+      }
+    }
+    if (!items.length){
+      /* fallback: single-item format without numbering */
+      var o2 = out.match(/ORIGINAL:\s*(.*?)\n\s*REWRITTEN:/s);
+      var r2 = out.match(/REWRITTEN:\s*(.*?)\n\s*WHY:/s);
+      var w2 = out.match(/WHY:\s*([^\n]+)/);
+      if (o2 && r2) items.push({ original: o2[1].trim(), rewritten: r2[1].trim(), why: w2 ? w2[1].trim() : "" });
+    }
+    return items.slice(0, 5);
+  }
+
+  function renderResults(){
+    var list = $("rwList");
+    list.innerHTML = rewrites.map(function(rw, i){
+      return '<div class="rw-card">' +
+        '<div class="rw-num">REWRITE ' + (i + 1) + ' OF ' + rewrites.length + '</div>' +
+        '<div class="rw-line rw-old"><b>BEFORE</b>' + esc(rw.original) + '</div>' +
+        '<div class="rw-line rw-new"><b>AFTER</b>' + esc(rw.rewritten) + '</div>' +
+        (rw.why ? '<div class="rw-why"><b>Why it works:</b> ' + esc(rw.why) + '</div>' : '') +
+        '</div>';
+    }).join("");
+    $("results").style.display = "block";
+    $("results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  /* ---------- copy all ---------- */
+  $("copyBtn").addEventListener("click", function(){
+    if (!rewrites.length) return;
+    var text = rewrites.map(function(rw){ return "• " + rw.rewritten; }).join("\n");
+    function done(){ $("copyBtn").textContent = "✓ Copied!"; setTimeout(function(){ $("copyBtn").textContent = "📋 Copy all rewrites"; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+    } else { fallbackCopy(text); done(); }
+    function fallbackCopy(t){
+      var ta = document.createElement("textarea");
+      ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch(e){}
+      document.body.removeChild(ta);
+    }
+  });
+
+  /* ---------- apply to builder ---------- */
+  $("applyBtn").addEventListener("click", function(){
+    if (!rewrites.length) return;
+    var optimized = originalText;
+    rewrites.forEach(function(rw){
+      if (rw.original && optimized.indexOf(rw.original) !== -1){
+        optimized = optimized.replace(rw.original, rw.rewritten);
+      }
+    });
+    try { localStorage.setItem("resumate_optimizer_input", optimized); } catch(e){}
+    location.href = "builder";
+  });
+})();
+</script>
+</body>
+</html>
