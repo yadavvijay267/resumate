@@ -888,7 +888,7 @@
     try { return (localStorage.getItem(AI_KEY_LS) || "").trim(); } catch (e) { return ""; }
   }
   function aiGetModel() {
-    try { return (localStorage.getItem(AI_MODEL_LS) || "").trim() || "gemini-2.0-flash"; } catch (e) { return "gemini-2.0-flash"; }
+    try { return (localStorage.getItem(AI_MODEL_LS) || "").trim() || "gemini-3-flash-preview"; } catch (e) { return "gemini-3-flash-preview"; }
   }
   function aiOpenModal() {
     el("aiKeyInput").value = aiGetKey();
@@ -897,7 +897,30 @@
   }
   function aiCloseModal() { el("aiModal").classList.remove("open"); }
 
+  /* Server-side Gemini (no key needed from the visitor). Returns the text,
+     or throws "no-server-key" when the server key is not configured yet
+     (or the site is not served by the ResuMate worker) so the caller can
+     fall back to the visitor's own key. Any other error is surfaced. */
+  async function aiCallProxy(prompt) {
+    var res;
+    try {
+      res = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt, model: aiGetModel() })
+      });
+    } catch (e) { throw new Error("no-server-key"); }
+    var data = await res.json().catch(function () { return null; });
+    if (!data) throw new Error("no-server-key");
+    if (res.status === 503 && data.error === "server_key_missing") throw new Error("no-server-key");
+    if (!res.ok) throw new Error(data.message || ("AI request failed (" + res.status + ")."));
+    if (!data.text || !data.text.trim()) throw new Error("The AI returned an empty response — try again.");
+    return data.text.trim();
+  }
+
   async function aiGenerate(prompt) {
+    try { return await aiCallProxy(prompt); }
+    catch (e) { if (e.message !== "no-server-key") throw e; }
     var key = aiGetKey();
     if (!key) { aiOpenModal(); throw new Error("key-missing"); }
     var model = aiGetModel();
@@ -1007,7 +1030,7 @@
     el("aiKeySave").addEventListener("click", function () {
       try {
         localStorage.setItem(AI_KEY_LS, el("aiKeyInput").value.trim());
-        localStorage.setItem(AI_MODEL_LS, el("aiModelInput").value.trim() || "gemini-2.0-flash");
+        localStorage.setItem(AI_MODEL_LS, el("aiModelInput").value.trim() || "gemini-3-flash-preview");
       } catch (e) {}
       aiCloseModal();
       setSaveStatus("AI key saved in this browser ✓", "ok");
@@ -1111,7 +1134,7 @@
     <label class="b-label" for="aiKeyInput">Gemini API key</label>
     <input class="b-input" type="password" id="aiKeyInput" placeholder="AIza…" autocomplete="off">
     <label class="b-label" for="aiModelInput">Model</label>
-    <input class="b-input" type="text" id="aiModelInput" placeholder="gemini-2.0-flash">
+    <input class="b-input" type="text" id="aiModelInput" placeholder="gemini-3-flash-preview">
     <div class="ai-modal-actions">
       <button type="button" class="btn btn-outline btn-sm" id="aiModalClose">Close</button>
       <button type="button" class="btn btn-primary btn-sm" id="aiKeySave">Save key</button>

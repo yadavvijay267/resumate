@@ -205,9 +205,29 @@
   var KEY_LS = "resumate_gemini_key", MODEL_LS = "resumate_gemini_model";
 
   function getKey(){ try { return (localStorage.getItem(KEY_LS)||"").trim(); } catch(e){ return ""; } }
-  function getModel(){ try { return (localStorage.getItem(MODEL_LS)||"").trim() || "gemini-2.0-flash"; } catch(e){ return "gemini-2.0-flash"; } }
+  function getModel(){ try { return (localStorage.getItem(MODEL_LS)||"").trim() || "gemini-3-flash-preview"; } catch(e){ return "gemini-3-flash-preview"; } }
+
+  /* Server-side Gemini (no key needed from the visitor). Returns the text,
+     or throws "no-server-key" when the server key is not configured yet
+     (or the site is not served by the ResuMate worker) so the caller can
+     fall back to the visitor's own key. Any other error is surfaced. */
+  async function callProxy(prompt){
+    var res;
+    try {
+      res = await fetch("/api/gemini", { method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ prompt: prompt, model: getModel() }) });
+    } catch (e) { throw new Error("no-server-key"); }
+    var data = await res.json().catch(function(){ return null; });
+    if (!data) throw new Error("no-server-key");
+    if (res.status === 503 && data.error === "server_key_missing") throw new Error("no-server-key");
+    if (!res.ok) throw new Error(data.message || ("AI request failed (" + res.status + ")."));
+    if (!data.text || !data.text.trim()) throw new Error("Empty AI response — try again.");
+    return data.text.trim();
+  }
 
   async function gemini(prompt){
+    try { return await callProxy(prompt); }
+    catch (e) { if (e.message !== "no-server-key") throw e; }
     var key = getKey();
     if (!key){
       var typed = ($("apiKeyInput").value||"").trim();
