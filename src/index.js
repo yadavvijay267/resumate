@@ -14,8 +14,13 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    if (url.pathname === "/api/gemini" && request.method === "POST") {
-      return handleGemini(request, env);
+    if (url.pathname === "/api/gemini") {
+      if (request.method === "POST") return handleGemini(request, env);
+      /* GET = readiness check (no Gemini call): tells the pages whether
+         the server key is set so they can hide the key input box. */
+      if (request.method === "GET") {
+        return json({ ready: !!env.GEMINI_API_KEY }, 200);
+      }
     }
 
     return env.ASSETS.fetch(request);

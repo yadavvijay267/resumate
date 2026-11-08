@@ -201,7 +201,19 @@
     return t.trim();
   }
 
-  if (!getKey()) $("keyNote").style.display = "block";
+  /* Show the key box only when the visitor has no key AND the server
+     proxy is not ready. The server check is a cheap GET; any failure
+     means "not ready" so the box still appears as a fallback. */
+  (async function () {
+    if (getKey()) return;
+    var ready = false;
+    try {
+      var r = await fetch("/api/gemini", { method: "GET" });
+      var d = await r.json();
+      ready = !!(d && d.ready);
+    } catch (e) { ready = false; }
+    if (!ready) $("keyNote").style.display = "block";
+  })();
 
   /* ---------- resume sources ---------- */
   function resumeToText(r){
