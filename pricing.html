@@ -131,7 +131,7 @@
         </div>
       </div>
     </nav>
-    <a class="btn btn-primary btn-sm header-cta" href="login">Sign In</a>
+    <a class="btn btn-primary btn-sm header-cta" href="login" id="authBtn">Sign In</a>
   </div>
 </header>
 
@@ -243,5 +243,32 @@
   <div class="footer-bottom">© 2026 ResuMate</div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+/* Header auth state: show "Sign out" when the visitor is already
+   signed in, so the header matches the builder/dashboard. */
+(function () {
+  var btn = document.getElementById("authBtn");
+  if (!btn) return;
+  function showSignedIn() {
+    btn.textContent = "Sign out";
+    btn.removeAttribute("href");
+    btn.style.cursor = "pointer";
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (window.RM) { RM.signOut().then(function () { location.reload(); }); }
+      else { location.reload(); }
+    });
+  }
+  function check() {
+    if (!window.RM || !RM.configured) return; /* demo/offline: stay "Sign In" */
+    RM.getUser().then(function (u) { if (u) showSignedIn(); }).catch(function () {});
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", check);
+  else check();
+})();
+</script>
 </body>
 </html>
