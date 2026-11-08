@@ -102,20 +102,20 @@
       <div class="nav-item">
         <a href="#">Engineering Resumes</a>
         <div class="dropdown">
-          <a href="#">Computer Science Resume</a>
-          <a href="#">Electronics Resume</a>
-          <a href="#">Mechanical Resume</a>
-          <a href="#">Civil Resume</a>
-          <a href="#">Engineering Fresher Resume</a>
+          <a href="builder" class="role-link" data-sample="software-engineer" data-tpl="corporate-modern">Computer Science Resume</a>
+          <a href="builder" class="role-link" data-blank="1" data-tpl="engineering-fresher">Electronics Resume</a>
+          <a href="builder" class="role-link" data-blank="1" data-tpl="engineering-fresher">Mechanical Resume</a>
+          <a href="builder" class="role-link" data-blank="1" data-tpl="engineering-fresher">Civil Resume</a>
+          <a href="builder" class="role-link" data-sample="cs-fresher" data-tpl="engineering-fresher">Engineering Fresher Resume</a>
         </div>
       </div>
       <div class="nav-item">
         <a href="#">Management Resumes</a>
         <div class="dropdown">
-          <a href="#">MBA Resume</a>
-          <a href="#">BBA Resume</a>
-          <a href="#">Business Analyst Resume</a>
-          <a href="#">Product Manager Resume</a>
+          <a href="builder" class="role-link" data-sample="mba-manager" data-tpl="business-executive">MBA Resume</a>
+          <a href="builder" class="role-link" data-sample="bba-analyst" data-tpl="management-professional">BBA Resume</a>
+          <a href="builder" class="role-link" data-sample="bba-analyst" data-tpl="management-professional">Business Analyst Resume</a>
+          <a href="builder" class="role-link" data-sample="mba-manager" data-tpl="business-executive">Product Manager Resume</a>
         </div>
       </div>
       <a href="index#templates">Templates</a>
@@ -124,10 +124,10 @@
         <a href="#">AI Career Tools</a>
         <div class="dropdown">
           <a href="ats-checker">AI ATS Score Checker</a>
-          <a href="#">AI Resume Optimizer</a>
-          <a href="#">AI Job Scan</a>
-          <a href="#">AI Resume Review</a>
+          <a href="optimizer">AI Resume Optimizer</a>
+          <a href="job-scan">AI Job Scan</a>
           <a href="interview-coach">AI Resume Interviewer</a>
+          <a href="negotiation-coach">AI Negotiation Coach</a>
         </div>
       </div>
     </nav>
@@ -268,6 +268,25 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", check);
   else check();
+})();
+
+/* Role nav links: open the builder with the matching sample (or a
+   blank form for roles with no sample) + the matching template. */
+(function () {
+  document.querySelectorAll("a.role-link").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      try {
+        var sample = link.getAttribute("data-sample");
+        var tpl = link.getAttribute("data-tpl");
+        var blank = link.getAttribute("data-blank");
+        if (sample) localStorage.setItem("resumate_sample", sample);
+        if (tpl) localStorage.setItem("resumate_selected_template", tpl);
+        if (blank) localStorage.setItem("resumate_blank", "1");
+      } catch (err) { /* storage unavailable — builder opens with defaults */ }
+      window.location.href = "builder";
+    });
+  });
 })();
 </script>
 </body>

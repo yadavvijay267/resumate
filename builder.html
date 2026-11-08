@@ -1044,6 +1044,11 @@
     var optimizedText = null;
     try { optimizedText = localStorage.getItem("resumate_optimizer_input"); localStorage.removeItem("resumate_optimizer_input"); } catch (e) { /* ignore */ }
 
+    /* Blank start (from a nav role link with no matching sample):
+       open the builder with an empty form instead of the default sample. */
+    var blankStart = false;
+    try { blankStart = localStorage.getItem("resumate_blank") === "1"; localStorage.removeItem("resumate_blank"); } catch (e) { /* ignore */ }
+
     /* Deep link from dashboard: builder.html?id=<resume-id> */
     var openId = null;
     try { openId = new URLSearchParams(window.location.search).get("id"); } catch (e) {}
@@ -1066,6 +1071,8 @@
         applyOptimizedText(optimizedText);
       } else if (chosenSample) {
         applySample();
+      } else if (blankStart) {
+        /* empty form — do not load the default sample */
       } else {
         var res = null;
         try {
@@ -1083,6 +1090,8 @@
         applyOptimizedText(optimizedText);
       } else if (chosenSample) {
         applySample();
+      } else if (blankStart) {
+        /* empty form — do not load the default sample */
       } else if (!demoLoad().length) {
         applySample();
       }
